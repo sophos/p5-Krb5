@@ -1,0 +1,48 @@
+#!/usr/local/bin/perl
+
+# sample_server
+# receives authentication info from a client using recvauth
+
+use blib;
+use IO::Socket;
+use Sys::Hostname;
+use Krb5 (KRB5_NT_SRV_HST);
+
+# replace with your own stuff
+$SERVICE = "sample";
+$KEYTAB_FILE = "/etc/krb5.keytab";
+
+chomp($SERVER = hostname());
+
+Krb5::init_context();
+Krb5::init_ets();
+
+$ac = new Krb5::AuthContext;
+
+$s = new IO::Socket::INET(
+	LocalAddr => $SERVER,
+	LocalPort => 12345,
+	Proto => 'tcp',
+	Reuse => 1,
+	Listen => 5
+);
+defined $s or die $!;
+
+$ns = $s->accept();
+
+$sprinc = Krb5::sname_to_principal($SERVER,$SERVICE,KRB5_NT_SRV_HST);
+$kt = Krb5::kt_resolve("FILE:$KEYTAB_FILE");
+$t = Krb5::recvauth($ac,$ns,"V1",$sprinc,$kt);
+if ($t) {
+	print "Received authentication info.\n";
+	$client = $t->enc_part2->client;
+	print "Hello, ",$client->data,".\n";
+}
+else {
+	print "recvauth error: ",Krb5::error(),"\n";
+}
+
+close($ns);
+close($s);
+
+Krb5::free_context();
