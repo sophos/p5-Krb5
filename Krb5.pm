@@ -56,7 +56,7 @@ require AutoLoader;
 	KRB5_NT_UNKNOWN
 	KRB5_TGS_NAME
 );
-$VERSION = '1.1';
+$VERSION = '1.2';
 
 sub KRB5_TGS_NAME() { return "krbtgt"; }
 

@@ -63,7 +63,7 @@ void can_free(SV *sv)
 
 	sprintf(key,"%p",sv);
 	if (!free_hash) free_hash = newHV();
-	hv_store(free_hash,key,strlen(key),&sv_yes,0);
+	hv_store(free_hash,key,strlen(key),&PL_sv_yes,0);
 }
 
 int should_free(SV *sv)

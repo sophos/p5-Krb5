@@ -27,7 +27,7 @@ krb5_ui_4		T_INT
 INPUT
 
 T_PTROBJ_NU
-	if ($arg == &sv_undef) {
+	if ($arg == &PL_sv_undef) {
 		$var = 0;
 	}
 	else if (sv_isa($arg, \"${ntype}\")) {

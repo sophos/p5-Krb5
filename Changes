@@ -1,5 +1,7 @@
 Revision history for Perl extension Krb5.
 
+1.2     Minor fix to support building for Perl 5.6.
+
 1.1     Corrected logic in freed() (internal memory management)
         Fixed segfault on Linux when calling Authen::Krb5::Ccache::DESTROY
 	 after calling Authen::Krb5::Ccache::destroy()
