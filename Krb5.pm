@@ -1,7 +1,3 @@
-# Copyright (c) 2000 Jeff Horwitz (jeff@laserlink.net).  All rights reserved.
-# This module is free software; you can redistribute it and/or modify it under
-# the same terms as Perl itself. 
-
 package Authen::Krb5;
 
 use strict;
@@ -56,7 +52,7 @@ require AutoLoader;
 	KRB5_NT_UNKNOWN
 	KRB5_TGS_NAME
 );
-$VERSION = '1.2';
+$VERSION = '1.3';
 
 sub KRB5_TGS_NAME() { return "krbtgt"; }
 
@@ -186,6 +182,14 @@ object for which you want an initial ticket.  'server' is a principal object
 for the service (usually krbtgt/REALM@REALM).  'password' is the password for
 the client, and 'cc' is a Authen::Krb5::Ccache object representing the current
 credentials cache.  Returns a Kerberos error code.
+
+=item get_in_tkt_with_keytab(client,server,keytab,cc)
+
+Obtain an initial ticket for the client using a keytab.  'client' is a
+principal object for which you want an initial ticket.  'server' is a principal
+object for the service (usually krbtgt/REALM@REALM).  'keytab' is a keytab
+object createed with kt_resolve.  'cc' is a Authen::Krb5::Ccache object
+representing the current credentials cache.  Returns a Kerberos error code.
 
 =item mk_req(auth_context,ap_req_options,service,hostname,in,cc)
 

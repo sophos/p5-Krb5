@@ -1,12 +1,3 @@
-/*
- * Kerberos 5 extensions for Perl 5
- * Author: Jeff Horwitz <jeff@laserlink.net>
- *
- * Copyright (c) 2000 Jeff Horwitz (jeff@laserlink.net).  All rights reserved.
- * This module is free software; you can redistribute it and/or modify it 
- * under the same terms as Perl itself.
- */
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -244,7 +235,7 @@ char *
 krb5_cc_default_name()
 
 	CODE:
-	RETVAL = krb5_cc_default_name(context);
+	RETVAL = (char *)krb5_cc_default_name(context);
 
 	OUTPUT:
 	RETVAL
@@ -297,6 +288,33 @@ krb5_get_in_tkt_with_password(client, server, password, cc)
 
 	err = krb5_get_in_tkt_with_password(context, 0, 0, NULL, NULL,
 		password, cc, &cr, 0);
+
+	if (err) XSRETURN_UNDEF;
+	XSRETURN_YES;
+
+void
+krb5_get_in_tkt_with_keytab(client, server, keytab, cc)
+	Authen::Krb5::Principal client
+	Authen::Krb5::Principal server
+	Authen::Krb5::Keytab    keytab
+	Authen::Krb5::Ccache cc
+
+	PREINIT:
+	krb5_creds cr;
+	krb5_timestamp now;
+	krb5_deltat lifetime = 0;
+
+	CODE:
+	memset((char *)&cr,0,sizeof(krb5_creds));
+	krb5_timeofday(context, &now);
+	cr.client = client;
+	cr.server = server;
+	cr.times.starttime = now;
+	cr.times.endtime = now + KRB5_DEFAULT_LIFE;
+	cr.times.renew_till = 0;
+
+	err = krb5_get_in_tkt_with_keytab(context, 0, 0, NULL, NULL,
+		keytab, cc, &cr, 0);
 
 	if (err) XSRETURN_UNDEF;
 	XSRETURN_YES;

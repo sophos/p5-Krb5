@@ -1,13 +1,9 @@
-Copyright (c) 2000 Jeff Horwitz (jeff@laserlink.net).  All rights reserved.
-This module is free software; you can redistribute it and/or modify it under   
-the same terms as Perl itself.
-
 Krb5 provides an object oriented interface to the most commonly used
 functions included in the Kerberos 5 API.  It was developed and tested
-using  Perl 5.005_03 and MIT Kerberos 5 version 1.0.5 and 1.1.1.
+using Perl 5.005_03 and MIT Kerberos 5 version 1.0.5 and 1.1.1.
 
 Your comments and bug reports are welcome.  Please send them to me at
-jeff@laserlink.net.
+jeff@smashing.org.
 
 
 REQUIREMENTS

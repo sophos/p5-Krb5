@@ -6,7 +6,9 @@ use ExtUtils::MakeMaker;
 my $KRB5_LIBDIR = '/usr/local/krb5/lib';
 
 # any extra libraries?
-my $KRB5_EXTRALIBS = '';
+# add -lresolv here if you get errors like the following (usually on linux):
+#  undefined symbol: __res_search
+my $KRB5_EXTRALIBS = '-lresolv';
 
 # location of Kerberos 5 includes
 my $KRB5_INCDIR = '/usr/local/krb5/include';
@@ -31,8 +33,7 @@ else {
 WriteMakefile(
     'NAME'	=> 'Authen::Krb5',
     'VERSION_FROM' => 'Krb5.pm',
-    'LIBS'	=> ["-L${KRB5_LIBDIR} -lkrb5 ${cryptolib} -lcom_err",
-			$KRB5_EXTRALIBS ],
+    'LIBS'	=> ["-L${KRB5_LIBDIR} -lkrb5 ${cryptolib} -lcom_err $KRB5_EXTRALIBS"],
     'DEFINE'	=> '',
     'INC'	=> "-I${KRB5_INCDIR} $KRB5_EXTRAINCS"
 );
