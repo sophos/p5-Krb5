@@ -1,13 +1,10 @@
-Copyright (c) 1998 Jeff Horwitz (jeff@laserlink.net).  All rights reserved.
+Copyright (c) 2000 Jeff Horwitz (jeff@laserlink.net).  All rights reserved.
 This module is free software; you can redistribute it and/or modify it under   
 the same terms as Perl itself.
 
-WARNING!  THIS IS ALPHA SOFTWARE AND MAY NOT FUNCTION CORRECTLY ON ALL
-PLATFORMS.  BOTH THE MODULE NAMESPACE AND THE API ARE SUBJECT TO CHANGE.
-
 Krb5 provides an object oriented interface to the most commonly used
 functions included in the Kerberos 5 API.  It was developed and tested
-using  Perl 5.004_04 and MIT Kerberos 5 version 1.0.5.
+using  Perl 5.005_03 and MIT Kerberos 5 version 1.0.5 and 1.1.1.
 
 Your comments and bug reports are welcome.  Please send them to me at
 jeff@laserlink.net.
@@ -23,8 +20,8 @@ BUILDING & INSTALLATION
 -----------------------
 Krb5 is built and installed in the usual Perl module fashion:
 
-1) edit Makefile.PL and change LIBS and INC to reflect the correct paths
-   to your Kerberos libraries and include files.
+1) edit Makefile.PL and change the variables in the top section according
+   to your Kerberos 5 configuration.
 2) perl Makefile.PL
 3) make
 4) make test (not implemented yet)

@@ -1,4 +1,4 @@
-# Copyright (c) 1999 Jeff Horwitz (jeff@laserlink.net).  All rights reserved.
+# Copyright (c) 2000 Jeff Horwitz (jeff@laserlink.net).  All rights reserved.
 # This module is free software; you can redistribute it and/or modify it under
 # the same terms as Perl itself. 
 
@@ -56,7 +56,7 @@ require AutoLoader;
 	KRB5_NT_UNKNOWN
 	KRB5_TGS_NAME
 );
-$VERSION = '1.0';
+$VERSION = '1.1';
 
 sub KRB5_TGS_NAME() { return "krbtgt"; }
 

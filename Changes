@@ -1,8 +1,14 @@
 Revision history for Perl extension Krb5.
 
+1.1     Corrected logic in freed() (internal memory management)
+        Fixed segfault on Linux when calling Authen::Krb5::Ccache::DESTROY
+	 after calling Authen::Krb5::Ccache::destroy()
+	Changed Makefile.PL to support auto-detection of crypto libraries.
+	Added support for building with MIT Kerberos 5 Version 1.1.1
+	
 1.0	Moved module into the Authen:: namespace.
 	Changed return syntax for some functions.  Compilation was failing
-	on certain platforms.
+	 on certain platforms.
 	Fixed some minor bugs.
 
 0.90	Tue Mar 17 10:25:43 1998

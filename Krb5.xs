@@ -2,7 +2,7 @@
  * Kerberos 5 extensions for Perl 5
  * Author: Jeff Horwitz <jeff@laserlink.net>
  *
- * Copyright (c) 1998 Jeff Horwitz (jeff@laserlink.net).  All rights reserved.
+ * Copyright (c) 2000 Jeff Horwitz (jeff@laserlink.net).  All rights reserved.
  * This module is free software; you can redistribute it and/or modify it 
  * under the same terms as Perl itself.
  */
@@ -79,7 +79,7 @@ void freed(SV *sv)
 {
 	char key[80];
 
-	if (free_hash) return;
+	if (!free_hash) return;
 	sprintf(key,"%p",sv);
 	hv_delete(free_hash,key,strlen(key),G_DISCARD);
 }
@@ -534,7 +534,10 @@ initialize(cc, p)
 	CODE:
 	err = krb5_cc_initialize(context, cc, p);
 	if (err) XSRETURN_UNDEF;
-	else XSRETURN_YES;
+	else {
+		can_free((SV *)cc);
+		XSRETURN_YES;
+	}
 
 char *
 get_name(cc)
@@ -564,16 +567,23 @@ destroy(cc)
 	Authen::Krb5::Ccache cc
 
 	CODE:
+	if (!should_free((SV*)cc)) XSRETURN_UNDEF;
+
 	err = krb5_cc_destroy(context, cc);
-	if (err) XSRETURN_UNDEF;
-	else XSRETURN_YES;
+	if (err) {
+		XSRETURN_UNDEF;
+	}
+	else {
+		freed((SV*)cc);
+		XSRETURN_YES;
+	}
 
 void
 DESTROY(cc)
 	Authen::Krb5::Ccache cc
 
 	CODE:
-	if (cc) {
+	if (should_free((SV *)cc)) {
 		krb5_cc_close(context, cc);
 		freed((SV *)cc);
 	}

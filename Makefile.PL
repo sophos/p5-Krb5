@@ -1,10 +1,38 @@
 use ExtUtils::MakeMaker;
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
+
+##### CHANGE THESE ACCORDING TO YOUR CONFIGURATION #####
+
+# location of Kerberos 5 libraries
+my $KRB5_LIBDIR = '/usr/local/krb5/lib';
+
+# any extra libraries?
+my $KRB5_EXTRALIBS = '';
+
+# location of Kerberos 5 includes
+my $KRB5_INCDIR = '/usr/local/krb5/include';
+
+# any extra include flags?
+my $KRB5_EXTRAINCS = '';
+
+##### DO NOT CHANGE ANYTHING BELOW HERE #####
+
+# check for libk5crypto -- only in krb5-1.1 and above
+print "Checking for libk5crypto...";
+my $cryptolib;
+if ( -r "${KRB5_LIBDIR}/libk5crypto.a" || -r "${KRB5_LIBDIR}/libk5crypto.so" ) {
+	print "yes\n";
+	$cryptolib = '-lk5crypto';
+}
+else {
+	print "no.  I'll use libcrypto instead.\n";
+	$cryptolib = '-lcrypto';
+}
+
 WriteMakefile(
     'NAME'	=> 'Authen::Krb5',
     'VERSION_FROM' => 'Krb5.pm',
-    'LIBS'	=> ['-L/usr/local/krb5/lib -lkrb5 -lcrypto -lcom_err'],
+    'LIBS'	=> ["-L${KRB5_LIBDIR} -lkrb5 ${cryptolib} -lcom_err",
+			$KRB5_EXTRALIBS ],
     'DEFINE'	=> '',
-    'INC'	=> '-I/usr/local/krb5/include',
+    'INC'	=> "-I${KRB5_INCDIR} $KRB5_EXTRAINCS"
 );
