@@ -6,7 +6,7 @@
 use blib;
 use IO::Socket;
 use Sys::Hostname;
-use Krb5 (ADDRTYPE_INET,ADDRTYPE_IPPORT,KRB5_NT_SRV_HST);
+use Authen::Krb5 (ADDRTYPE_INET,ADDRTYPE_IPPORT,KRB5_NT_SRV_HST);
 
 # replace with your own stuff
 $SERVICE = "sample";
@@ -14,10 +14,10 @@ $KEYTAB_FILE = "/etc/krb5.keytab";
 
 chomp($SERVER = hostname());
 
-Krb5::init_context();
-Krb5::init_ets();
+Authen::Krb5::init_context();
+Authen::Krb5::init_ets();
 
-$ac = new Krb5::AuthContext;
+$ac = new Authen::Krb5::AuthContext;
 
 $s = new IO::Socket::INET(
 	LocalAddr => $SERVER,
@@ -31,8 +31,8 @@ defined $s or die $!;
 $ns = $s->accept();
 
 # grab the client's address
-$addr = new Krb5::Address(ADDRTYPE_INET,pack("N",$ns->peeraddr()));
-$ports = new Krb5::Address(ADDRTYPE_IPPORT,pack("n",$ns->peerport()));
+$addr = new Authen::Krb5::Address(ADDRTYPE_INET,pack("N",$ns->peeraddr()));
+$ports = new Authen::Krb5::Address(ADDRTYPE_IPPORT,pack("n",$ns->peerport()));
 
 # get authentication info
 while (defined($line = <$ns>)) {
@@ -54,11 +54,11 @@ while (defined($line = <$ns>)) {
 	}
 }
 
-$sprinc = Krb5::sname_to_principal($SERVER,$SERVICE,KRB5_NT_SRV_HST);
-$kt = Krb5::kt_resolve("FILE:$KEYTAB_FILE");
-$t = Krb5::rd_req($ac,$d,$sprinc,$kt);
+$sprinc = Authen::Krb5::sname_to_principal($SERVER,$SERVICE,KRB5_NT_SRV_HST);
+$kt = Authen::Krb5::kt_resolve("FILE:$KEYTAB_FILE");
+$t = Authen::Krb5::rd_req($ac,$d,$sprinc,$kt);
 unless ($t) {
-	print "rd_req error: ",Krb5::error(),"\n";
+	print "rd_req error: ",Authen::Krb5::error(),"\n";
 	exit(1);
 }
 
@@ -70,12 +70,12 @@ $ac->setaddrs(undef,$addr);
 $ac->setports(undef,$ports);
 
 # decrypt the message
-$dec = Krb5::rd_priv($ac,$enc);
+$dec = Authen::Krb5::rd_priv($ac,$enc);
 unless ($dec) {
-	print "rd_priv error: ",Krb5::error(),"\n";
+	print "rd_priv error: ",Authen::Krb5::error(),"\n";
 	exit(1);
 }
 
 print "Decrypted message is: '$dec'\n";
 
-Krb5::free_context();
+Authen::Krb5::free_context();

@@ -1,16 +1,21 @@
 TYPEMAP
 
-Krb5::Ccache		T_PTROBJ_NU
-Krb5::Principal		T_PTROBJ_NU
-Krb5::AuthContext	T_PTROBJ_NU
-Krb5::Rcache		T_PTROBJ_NU
-Krb5::Creds		T_PTROBJ_NU
-Krb5::ApRepEncPart	T_PTROBJ_NU
-Krb5::Error		T_PTROBJ_NU
-Krb5::Ticket		T_PTROBJ_NU
-Krb5::Keytab		T_PTROBJ_NU
-Krb5::EncTktPart	T_PTROBJ_NU
-Krb5::Address		T_PTROBJ_NU
+Authen::Krb5::Ccache		T_PTROBJ_NU
+Authen::Krb5::Principal		T_PTROBJ_NU
+Authen::Krb5::AuthContext	T_PTROBJ_NU
+Authen::Krb5::Rcache		T_PTROBJ_NU
+Authen::Krb5::Creds		T_PTROBJ_NU
+Authen::Krb5::ApRepEncPart	T_PTROBJ_NU
+Authen::Krb5::Error		T_PTROBJ_NU
+Authen::Krb5::Ticket		T_PTROBJ_NU
+Authen::Krb5::Keytab		T_PTROBJ_NU
+Authen::Krb5::EncTktPart	T_PTROBJ_NU
+Authen::Krb5::Ccache            T_PTROBJ_NU
+Authen::Krb5::Principal         T_PTROBJ_NU
+Authen::Krb5::AuthContext       T_PTROBJ_NU
+Authen::Krb5::Rcache            T_PTROBJ_NU
+Authen::Krb5::Creds             T_PTROBJ_NU
+Authen::Krb5::Address		T_PTROBJ_NU
 
 struct in_addr *	T_PTROBJ_NU
 krb5_error_code		T_INT

@@ -1,4 +1,4 @@
-Copyright (c) 1998 Jeff Horwitz (jhorwitz@umich.edu).  All rights reserved.
+Copyright (c) 1998 Jeff Horwitz (jeff@laserlink.net).  All rights reserved.
 This module is free software; you can redistribute it and/or modify it under   
 the same terms as Perl itself.
 
@@ -10,7 +10,7 @@ functions included in the Kerberos 5 API.  It was developed and tested
 using  Perl 5.004_04 and MIT Kerberos 5 version 1.0.5.
 
 Your comments and bug reports are welcome.  Please send them to me at
-jhorwitz@umich.edu.
+jeff@laserlink.net.
 
 
 REQUIREMENTS

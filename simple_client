@@ -5,16 +5,16 @@
 
 use blib;
 use IO::Socket;
-use Krb5 (ADDRTYPE_INET,ADDRTYPE_IPPORT);
+use Authen::Krb5 (ADDRTYPE_INET,ADDRTYPE_IPPORT);
 
 # replace with your own stuff
 $SERVICE = "sample";
 $SERVER = "server.domain.edu";
 
-Krb5::init_context();
-Krb5::init_ets();
+Authen::Krb5::init_context();
+Authen::Krb5::init_ets();
 
-$ac = new Krb5::AuthContext;
+$ac = new Authen::Krb5::AuthContext;
 
 $s = new IO::Socket::INET(
 	PeerAddr => $SERVER,
@@ -23,30 +23,30 @@ $s = new IO::Socket::INET(
 );
 defined $s or die $!;
 
-$cc = Krb5::cc_default();
-$d = Krb5::mk_req($ac,0,$SERVICE,$SERVER,'testing',$cc);
+$cc = Authen::Krb5::cc_default();
+$d = Authen::Krb5::mk_req($ac,0,$SERVICE,$SERVER,'testing',$cc);
 unless ($d) {
-	print "mk_req error: ",Krb5::error(),"\n";
+	print "mk_req error: ",Authen::Krb5::error(),"\n";
 	exit(1);
 }
 
 # set local and remote addresses, using network byte order
-$addr = new Krb5::Address(ADDRTYPE_INET,pack("N",$s->sockaddr()));
-$ports = new Krb5::Address(ADDRTYPE_IPPORT,pack("n",$s->sockport()));
+$addr = new Authen::Krb5::Address(ADDRTYPE_INET,pack("N",$s->sockaddr()));
+$ports = new Authen::Krb5::Address(ADDRTYPE_IPPORT,pack("n",$s->sockport()));
 $ac->setaddrs($addr,undef);
 $ac->setports($ports,undef);
 
 # create the replay cache
 ($l,$r) = $ac->getaddrs();
-$lap = Krb5::gen_portaddr($l,$s->sockport());
-$rcn = Krb5::gen_replay_name($lap,"foobar");
-$rc = Krb5::get_server_rcache($rcn);
+$lap = Authen::Krb5::gen_portaddr($l,$s->sockport());
+$rcn = Authen::Krb5::gen_replay_name($lap,"foobar");
+$rc = Authen::Krb5::get_server_rcache($rcn);
 $ac->setrcache($rc);
 
 #encrypt the message
-$enc = Krb5::mk_priv($ac,"There's more than one way to do it.");
+$enc = Authen::Krb5::mk_priv($ac,"There's more than one way to do it.");
 unless ($enc) {
-	print "mk_priv error: ",Krb5::error(),"\n";
+	print "mk_priv error: ",Authen::Krb5::error(),"\n";
 	exit(1);
 }
 
@@ -55,4 +55,4 @@ print "Sent authentication info and encrypted message.\n";
 
 close($s);
 
-Krb5::free_context();
+Authen::Krb5::free_context();

@@ -1,8 +1,8 @@
 /*
- * Kerberos 4 extensions for Perl 5
- * Author: Jeff Horwitz <jhorwitz@umich.edu>
+ * Kerberos 5 extensions for Perl 5
+ * Author: Jeff Horwitz <jeff@laserlink.net>
  *
- * Copyright (c) 1998 Jeff Horwitz (jhorwitz@umich.edu).  All rights reserved.
+ * Copyright (c) 1998 Jeff Horwitz (jeff@laserlink.net).  All rights reserved.
  * This module is free software; you can redistribute it and/or modify it 
  * under the same terms as Perl itself.
  */
@@ -24,17 +24,17 @@ extern "C" {
 /* change this if 10 hours doesn't suit you */
 #define KRB5_DEFAULT_LIFE 60*60*10
 
-typedef krb5_ccache		Krb5__Ccache;
-typedef krb5_principal		Krb5__Principal;
-typedef krb5_auth_context	Krb5__AuthContext;
-typedef krb5_rcache		Krb5__Rcache;
-typedef krb5_creds		*Krb5__Creds;
-typedef krb5_ap_rep_enc_part	*Krb5__ApRepEncPart;
-typedef krb5_ticket		*Krb5__Ticket;
-typedef krb5_keytab		Krb5__Keytab;
-typedef krb5_enc_tkt_part	*Krb5__EncTktPart;
-typedef krb5_error		*Krb5__Error;
-typedef krb5_address		*Krb5__Address;
+typedef krb5_ccache		Authen__Krb5__Ccache;
+typedef krb5_principal		Authen__Krb5__Principal;
+typedef krb5_auth_context	Authen__Krb5__AuthContext;
+typedef krb5_rcache		Authen__Krb5__Rcache;
+typedef krb5_creds		*Authen__Krb5__Creds;
+typedef krb5_ap_rep_enc_part	*Authen__Krb5__ApRepEncPart;
+typedef krb5_ticket		*Authen__Krb5__Ticket;
+typedef krb5_keytab		Authen__Krb5__Keytab;
+typedef krb5_enc_tkt_part	*Authen__Krb5__EncTktPart;
+typedef krb5_error		*Authen__Krb5__Error;
+typedef krb5_address		*Authen__Krb5__Address;
 
 static krb5_context context = 0;
 static krb5_error_code err;
@@ -85,7 +85,7 @@ void freed(SV *sv)
 }
 
 
-MODULE = Krb5		PACKAGE = Krb5		PREFIX = krb5_
+MODULE = Authen::Krb5		PACKAGE = Authen::Krb5		PREFIX = krb5_
 
 double
 constant(name, arg)
@@ -111,7 +111,7 @@ void
 krb5_init_context()
 
 	CODE:
-	if (context) croak("Krb5 already initialized");
+	if (context) croak("Authen::Krb5 already initialized");
 	err = krb5_init_context(&context);
 	if (err) XSRETURN_UNDEF;
 	XSRETURN_YES;
@@ -120,7 +120,7 @@ void
 krb5_free_context()
 
 	CODE:
-	if (!context) croak("Krb5 not yet initialized");
+	if (!context) croak("Authen::Krb5 not yet initialized");
 	krb5_free_context(context);
 
 void
@@ -179,9 +179,9 @@ krb5_get_krbhst(realm)
 	}
 	krb5_free_krbhst(context,hostlist);
 
-Krb5::Principal
+Authen::Krb5::Principal
 krb5_build_principal_ext(p)
-	Krb5::Principal p
+	Authen::Krb5::Principal p
 
 	CODE:
 	err = krb5_build_principal_ext(context, &RETVAL,
@@ -199,7 +199,7 @@ krb5_build_principal_ext(p)
 	OUTPUT:
 	RETVAL
 
-Krb5::Principal
+Authen::Krb5::Principal
 krb5_parse_name(name)
 	char *name
 
@@ -212,7 +212,7 @@ krb5_parse_name(name)
 	OUTPUT:
 	RETVAL
 
-Krb5::Principal
+Authen::Krb5::Principal
 krb5_sname_to_principal(hostname,sname,type)
 	char *hostname
 	char *sname
@@ -227,8 +227,8 @@ krb5_sname_to_principal(hostname,sname,type)
 	OUTPUT:
 	RETVAL
 
-Krb5::Ccache
-kbr5_cc_resolve(string_name)
+Authen::Krb5::Ccache
+krb5_cc_resolve(string_name)
 	char *string_name
 
 	CODE:
@@ -249,7 +249,7 @@ krb5_cc_default_name()
 	OUTPUT:
 	RETVAL
 
-Krb5::Ccache
+Authen::Krb5::Ccache
 krb5_cc_default()
 
 	CODE:
@@ -261,7 +261,7 @@ krb5_cc_default()
 	OUTPUT:
 	RETVAL
 
-Krb5::Keytab
+Authen::Krb5::Keytab
 krb5_kt_resolve(string_name)
 	char *string_name
 
@@ -276,10 +276,10 @@ krb5_kt_resolve(string_name)
 
 void
 krb5_get_in_tkt_with_password(client, server, password, cc)
-	Krb5::Principal client
-	Krb5::Principal server
+	Authen::Krb5::Principal client
+	Authen::Krb5::Principal server
 	char *password
-	Krb5::Ccache cc
+	Authen::Krb5::Ccache cc
 
 	PREINIT:
 	krb5_creds cr;
@@ -298,16 +298,17 @@ krb5_get_in_tkt_with_password(client, server, password, cc)
 	err = krb5_get_in_tkt_with_password(context, 0, 0, NULL, NULL,
 		password, cc, &cr, 0);
 
-	err ? XSRETURN_UNDEF : XSRETURN_YES;
+	if (err) XSRETURN_UNDEF;
+	XSRETURN_YES;
 
 SV *
 krb5_mk_req(auth_context, ap_req_options, service, hostname, in, cc)
-	Krb5::AuthContext auth_context
+	Authen::Krb5::AuthContext auth_context
 	krb5_flags ap_req_options
 	char *service
 	char *hostname
 	SV *in
-	Krb5::Ccache cc
+	Authen::Krb5::Ccache cc
 
 	PREINIT:
 	krb5_data in_data, out_data;
@@ -322,12 +323,12 @@ krb5_mk_req(auth_context, ap_req_options, service, hostname, in, cc)
 	OUTPUT:
 	RETVAL
 
-Krb5::Ticket
+Authen::Krb5::Ticket
 krb5_rd_req(auth_context,in,server,keytab=0)
-	Krb5::AuthContext auth_context
+	Authen::Krb5::AuthContext auth_context
 	SV *in
-	Krb5::Principal server
-	Krb5::Keytab keytab
+	Authen::Krb5::Principal server
+	Authen::Krb5::Keytab keytab
 
 	PREINIT:
 	krb5_data in_data;
@@ -347,9 +348,9 @@ krb5_rd_req(auth_context,in,server,keytab=0)
 	OUTPUT:
 	RETVAL
 
-Krb5::Address
+Authen::Krb5::Address
 gen_portaddr(addr,port)
-	Krb5::Address addr
+	Authen::Krb5::Address addr
 	unsigned short port
 
 	CODE:
@@ -361,7 +362,7 @@ gen_portaddr(addr,port)
 
 void
 genaddrs(auth_context,fh,flags)
-	Krb5::AuthContext auth_context
+	Authen::Krb5::AuthContext auth_context
 	FILE *fh; 
 	krb5_flags flags
 
@@ -371,11 +372,12 @@ genaddrs(auth_context,fh,flags)
 	CODE:
 	fd = fileno(fh);
 	err = krb5_auth_con_genaddrs(context,auth_context,fd,flags);
-	err ? XSRETURN_UNDEF : XSRETURN_YES;  
+	if (err) XSRETURN_UNDEF;
+	XSRETURN_YES;  
 
 char *
 gen_replay_name(addr,uniq)
-	Krb5::Address addr
+	Authen::Krb5::Address addr
 	char *uniq
 
 	CODE:
@@ -387,7 +389,7 @@ gen_replay_name(addr,uniq)
 	
 void
 krb5_mk_priv(auth_context,in)
-	Krb5::AuthContext auth_context
+	Authen::Krb5::AuthContext auth_context
 	SV *in
 
 	PREINIT:
@@ -402,7 +404,7 @@ krb5_mk_priv(auth_context,in)
 
 void
 krb5_rd_priv(auth_context,in)
-	Krb5::AuthContext auth_context
+	Authen::Krb5::AuthContext auth_context
 	SV *in
 
 	PREINIT:
@@ -414,7 +416,7 @@ krb5_rd_priv(auth_context,in)
 	if (err) XSRETURN_UNDEF;
 	XPUSHs(sv_2mortal(newSVpv(out_data.data,out_data.length)));
 
-Krb5::Rcache
+Authen::Krb5::Rcache
 krb5_get_server_rcache(piece)
 	SV *piece
 
@@ -432,15 +434,15 @@ krb5_get_server_rcache(piece)
 
 void
 krb5_sendauth(auth_context,fh,version,client,server,options,in,in_creds,cc)
-	Krb5::AuthContext auth_context
+	Authen::Krb5::AuthContext auth_context
 	FILE *fh
 	char *version
-	Krb5::Principal client
-	Krb5::Principal server
+	Authen::Krb5::Principal client
+	Authen::Krb5::Principal server
 	int options
 	SV *in
-	Krb5::Creds in_creds
-	Krb5::Ccache cc
+	Authen::Krb5::Creds in_creds
+	Authen::Krb5::Ccache cc
 
 	PREINIT:
 	krb5_data in_data;
@@ -452,15 +454,16 @@ krb5_sendauth(auth_context,fh,version,client,server,options,in,in_creds,cc)
 	in_data.data = SvPV(in,in_data.length);
 	err = krb5_sendauth(context,&auth_context,&fd,version,client,server,
 		options,&in_data,in_creds,cc,NULL,NULL,&out_creds);
-	err ? XSRETURN_UNDEF : XSRETURN_YES;
+	if (err) XSRETURN_UNDEF;
+	XSRETURN_YES;
 
 void
 krb5_recvauth(auth_context,fh,version,server,keytab)
-	Krb5::AuthContext auth_context
+	Authen::Krb5::AuthContext auth_context
 	FILE *fh
 	char *version
-	Krb5::Principal server
-	Krb5::Keytab keytab
+	Authen::Krb5::Principal server
+	Authen::Krb5::Keytab keytab
 
 	PREINIT:
 	krb5_ticket *ticket = NULL;
@@ -472,22 +475,22 @@ krb5_recvauth(auth_context,fh,version,server,keytab)
 		keytab,&ticket);
 	if (err) XSRETURN_UNDEF;
 	ST(0) = sv_newmortal();
-	sv_setref_pv(ST(0),"Krb5::Ticket",(void*)ticket);
+	sv_setref_pv(ST(0),"Authen::Krb5::Ticket",(void*)ticket);
 	XSRETURN(1);
 
 
-MODULE = Krb5	PACKAGE = Krb5::Principal
+MODULE = Authen::Krb5	PACKAGE = Authen::Krb5::Principal
 
 void
 realm(p)
-	Krb5::Principal p
+	Authen::Krb5::Principal p
 
 	CODE:
 	ST(0) = sv_2mortal(newSVpv(p->realm.data,p->realm.length));
 
 krb5_int32
 type(p)
-	Krb5::Principal p
+	Authen::Krb5::Principal p
 
 	CODE:
 	RETVAL = p->type;
@@ -497,7 +500,7 @@ type(p)
 
 void
 data(p)
-	Krb5::Principal p
+	Authen::Krb5::Principal p
 
 	PPCODE:
 	if (p->length > 0) {
@@ -512,7 +515,7 @@ data(p)
 
 void
 DESTROY(p)
-	Krb5::Principal p
+	Authen::Krb5::Principal p
 
 	CODE:
 	if (p && should_free((SV *)p)) {
@@ -521,12 +524,12 @@ DESTROY(p)
 	}
 
 
-MODULE = Krb5	PACKAGE = Krb5::Ccache
+MODULE = Authen::Krb5	PACKAGE = Authen::Krb5::Ccache
 
 void
 initialize(cc, p)
-	Krb5::Ccache cc
-	Krb5::Principal p
+	Authen::Krb5::Ccache cc
+	Authen::Krb5::Principal p
 
 	CODE:
 	err = krb5_cc_initialize(context, cc, p);
@@ -535,7 +538,7 @@ initialize(cc, p)
 
 char *
 get_name(cc)
-	Krb5::Ccache cc
+	Authen::Krb5::Ccache cc
 
 	CODE:
 	RETVAL = krb5_cc_get_name(context, cc);
@@ -543,9 +546,9 @@ get_name(cc)
 	OUTPUT:
 	RETVAL
 
-Krb5::Principal
+Authen::Krb5::Principal
 get_principal(cc)
-	Krb5::Ccache cc
+	Authen::Krb5::Ccache cc
 
 	CODE:
 	err = krb5_cc_get_principal(context, cc, &RETVAL);
@@ -558,7 +561,7 @@ get_principal(cc)
 
 void
 destroy(cc)
-	Krb5::Ccache cc
+	Authen::Krb5::Ccache cc
 
 	CODE:
 	err = krb5_cc_destroy(context, cc);
@@ -567,7 +570,7 @@ destroy(cc)
 
 void
 DESTROY(cc)
-	Krb5::Ccache cc
+	Authen::Krb5::Ccache cc
 
 	CODE:
 	if (cc) {
@@ -575,9 +578,9 @@ DESTROY(cc)
 		freed((SV *)cc);
 	}
 
-MODULE = Krb5	PACKAGE = Krb5::AuthContext
+MODULE = Authen::Krb5	PACKAGE = Authen::Krb5::AuthContext
 
-Krb5::AuthContext
+Authen::Krb5::AuthContext
 new(class)
 	char *class
 
@@ -592,7 +595,7 @@ new(class)
 
 int
 getflags(auth_context)
-	Krb5::AuthContext auth_context
+	Authen::Krb5::AuthContext auth_context
 
 	PREINIT:
 	krb5_int32 flags;
@@ -606,17 +609,18 @@ getflags(auth_context)
 
 void
 setflags(auth_context,flags)
-	Krb5::AuthContext auth_context
+	Authen::Krb5::AuthContext auth_context
 	krb5_int32 flags
 
 	CODE:
 	err = krb5_auth_con_setflags(context,auth_context,flags);
 
-	err ? XSRETURN_UNDEF : XSRETURN_YES;
+	if(err) XSRETURN_UNDEF;
+	XSRETURN_YES;
 
-Krb5::Rcache
+Authen::Krb5::Rcache
 getrcache(auth_context)
-	Krb5::AuthContext auth_context
+	Authen::Krb5::AuthContext auth_context
 
 	CODE:
 	err = krb5_auth_con_getrcache(context,auth_context,&RETVAL);
@@ -627,16 +631,17 @@ getrcache(auth_context)
 
 void
 setrcache(auth_context,rc)
-	Krb5::AuthContext auth_context
-	Krb5::Rcache rc
+	Authen::Krb5::AuthContext auth_context
+	Authen::Krb5::Rcache rc
 
 	CODE:
 	err = krb5_auth_con_setrcache(context,auth_context,rc);
-	err ? XSRETURN_UNDEF : XSRETURN_YES;
+	if (err) XSRETURN_UNDEF;
+	XSRETURN_YES;
 
 void
 getaddrs(auth_context)
-	Krb5::AuthContext auth_context
+	Authen::Krb5::AuthContext auth_context
 
 	PREINIT:
 	krb5_address *local, *remote;
@@ -647,37 +652,39 @@ getaddrs(auth_context)
 
 	ST(0) = sv_newmortal();
 	ST(1) = sv_newmortal();
-	sv_setref_pv(ST(0), "Krb5::Address", (void*)local);
-	sv_setref_pv(ST(1), "Krb5::Address", (void*)remote);
+	sv_setref_pv(ST(0), "Authen::Krb5::Address", (void*)local);
+	sv_setref_pv(ST(1), "Authen::Krb5::Address", (void*)remote);
 	XSRETURN(2);
 
 void
 setaddrs(auth_context,laddr,raddr)
-	Krb5::AuthContext auth_context
-	Krb5::Address laddr
-	Krb5::Address raddr
+	Authen::Krb5::AuthContext auth_context
+	Authen::Krb5::Address laddr
+	Authen::Krb5::Address raddr
 
 	CODE:
 	if (!SvOK((SV*)ST(1))) laddr = NULL;
 	if (!SvOK((SV*)ST(2))) raddr = NULL;
 	err = krb5_auth_con_setaddrs(context,auth_context,laddr,raddr);
-	err ? XSRETURN_UNDEF : XSRETURN_YES;
+	if (err) XSRETURN_UNDEF;
+	XSRETURN_YES;
 
 void
 setports(auth_context,laddr,raddr)
-	Krb5::AuthContext auth_context
-	Krb5::Address laddr
-	Krb5::Address raddr
+	Authen::Krb5::AuthContext auth_context
+	Authen::Krb5::Address laddr
+	Authen::Krb5::Address raddr
 
 	CODE:
 	if (!SvOK((SV*)ST(1))) laddr = NULL;
 	if (!SvOK((SV*)ST(2))) raddr = NULL;
 	err = krb5_auth_con_setports(context,auth_context,laddr,raddr);
-	err ? XSRETURN_UNDEF : XSRETURN_YES;
+	if (err) XSRETURN_UNDEF;
+	XSRETURN_YES;
 
 void
 DESTROY(auth_context)
-	Krb5::AuthContext auth_context;
+	Authen::Krb5::AuthContext auth_context;
 
 	CODE:
 	if (auth_context) {
@@ -685,11 +692,11 @@ DESTROY(auth_context)
 		freed((SV *)auth_context);
 	}
 
-MODULE = Krb5	PACKAGE = Krb5::Ticket
+MODULE = Authen::Krb5	PACKAGE = Authen::Krb5::Ticket
 
-Krb5::Principal
+Authen::Krb5::Principal
 server(t)
-	Krb5::Ticket t
+	Authen::Krb5::Ticket t
 
 	CODE:
 	RETVAL = t->server;
@@ -697,9 +704,9 @@ server(t)
 	OUTPUT:
 	RETVAL
 
-Krb5::EncTktPart
+Authen::Krb5::EncTktPart
 enc_part2(t)
-	Krb5::Ticket t
+	Authen::Krb5::Ticket t
 
 	CODE:
 	RETVAL = t->enc_part2;
@@ -709,7 +716,7 @@ enc_part2(t)
 
 void
 DESTROY(t)
-	Krb5::Ticket t
+	Authen::Krb5::Ticket t
 
 	CODE:
 	if (t) {
@@ -717,11 +724,11 @@ DESTROY(t)
 		freed((SV *)t);
 	}
 
-MODULE = Krb5	PACKAGE = Krb5::EncTktPart
+MODULE = Authen::Krb5	PACKAGE = Authen::Krb5::EncTktPart
 
-Krb5::Principal
+Authen::Krb5::Principal
 client(etp)
-	Krb5::EncTktPart etp
+	Authen::Krb5::EncTktPart etp
 
 	CODE:
 	RETVAL = etp->client;
@@ -731,7 +738,7 @@ client(etp)
 
 void
 DESTROY(etp)
-	Krb5::EncTktPart etp
+	Authen::Krb5::EncTktPart etp
 
 	CODE:
 	if (etp && should_free((SV *)etp)) {
@@ -739,9 +746,9 @@ DESTROY(etp)
 		freed((SV *)etp);
 	}
 
-MODULE = Krb5	PACKAGE = Krb5::Address
+MODULE = Authen::Krb5	PACKAGE = Authen::Krb5::Address
 
-Krb5::Address
+Authen::Krb5::Address
 new(class,addrtype,contents)
 	char *class
 	unsigned int addrtype
@@ -757,7 +764,7 @@ new(class,addrtype,contents)
 
 void
 DESTROY(addr)
-	Krb5::Address addr
+	Authen::Krb5::Address addr
 
 	CODE:
 	if (addr && should_free((SV *)addr)) {
