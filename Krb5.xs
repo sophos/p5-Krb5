@@ -26,9 +26,14 @@ typedef krb5_keytab		Authen__Krb5__Keytab;
 typedef krb5_enc_tkt_part	*Authen__Krb5__EncTktPart;
 typedef krb5_error		*Authen__Krb5__Error;
 typedef krb5_address		*Authen__Krb5__Address;
+typedef krb5_keyblock		*Authen__Krb5__Keyblock;
+typedef krb5_keytab_entry	*Authen__Krb5__KeytabEntry;
+typedef krb5_kt_cursor          *Authen__Krb5__KeytabCursor;
+typedef krb5_keyblock		*Authen__Krb5__KeyBlock;
 
 static krb5_context context = 0;
 static krb5_error_code err;
+static krb5_keytab_entry keytab_entry_init;
 
 /*
  * The following three routines implement a "safehouse" for nested Kerberos
@@ -264,6 +269,43 @@ krb5_kt_resolve(string_name)
 
 	OUTPUT:
 	RETVAL
+
+char *
+krb5_kt_default_name()
+        CODE:
+        char name[BUFSIZ];
+        err = krb5_kt_default_name(context, name, sizeof name - 1);
+	if (err)
+                XSRETURN_UNDEF;
+        name[sizeof name - 1] = '\0';
+	ST(0) = sv_2mortal(newSVpv(name, 0));
+
+Authen::Krb5::Keytab
+krb5_kt_default()
+        CODE:
+        err = krb5_kt_default(context, &RETVAL);
+	if (err)
+                XSRETURN_UNDEF;
+
+        OUTPUT:
+        RETVAL
+
+Authen::Krb5::Keyblock
+krb5_kt_read_service_key(name, principal, kvno = 0, enctype = 0)
+        char *name
+        Authen::Krb5::Principal principal
+        krb5_kvno kvno
+        krb5_enctype enctype
+
+        CODE:
+        err = krb5_kt_read_service_key(context, name, principal, kvno, enctype,
+            &RETVAL);
+        if (err)
+                XSRETURN_UNDEF;
+        can_free((SV *)RETVAL);
+
+        OUTPUT:
+        RETVAL
 
 void
 krb5_get_in_tkt_with_password(client, server, password, cc)
@@ -606,6 +648,60 @@ DESTROY(cc)
 		freed((SV *)cc);
 	}
 
+MODULE = Authen::Krb5	PACKAGE = Authen::Krb5::KeyBlock
+
+int
+length(kb)
+	Authen::Krb5::KeyBlock kb
+
+	CODE:
+	RETVAL = kb->length;
+
+	OUTPUT:
+	RETVAL
+
+void
+contents(kb)
+	Authen::Krb5::KeyBlock kb
+
+	PPCODE:
+	/* sv_2mortal here causes 'Attempt to free unreferenced scalar' later */
+	XPUSHs(newSVpvn((char*)(kb->contents), kb->length));
+
+int
+enctype(kb)
+	Authen::Krb5::KeyBlock kb
+
+	CODE:
+	RETVAL = (int)kb->enctype;
+
+	OUTPUT:
+	RETVAL
+
+void
+enctype_string(kb)
+	Authen::Krb5::KeyBlock kb
+
+	PREINIT:
+	char buf[256];
+
+	PPCODE:
+	err = krb5_enctype_to_string(kb->enctype, buf, 255);
+	if (err) {
+		XSRETURN_UNDEF;
+	}
+	XPUSHs(newSVpv(buf, 0));
+
+void
+DESTROY(kb)
+	Authen::Krb5::KeyBlock kb
+
+	CODE:
+	if (kb && should_free((SV *)kb)) {
+		krb5_free_keyblock(context,kb);
+		freed((SV *)kb);
+	}
+
 MODULE = Authen::Krb5	PACKAGE = Authen::Krb5::AuthContext
 
 Authen::Krb5::AuthContext
@@ -710,6 +806,21 @@ setports(auth_context,laddr,raddr)
 	if (err) XSRETURN_UNDEF;
 	XSRETURN_YES;
 
+Authen::Krb5::KeyBlock
+getkey(auth_context)
+	Authen::Krb5::AuthContext auth_context;
+
+	PREINIT:
+	SV *sv;
+
+	CODE:
+	err = krb5_auth_con_getkey(context, auth_context, &RETVAL);
+	if (err) XSRETURN_UNDEF;
+	can_free((SV *)RETVAL);
+
+	OUTPUT:
+	RETVAL
+
 void
 DESTROY(auth_context)
 	Authen::Krb5::AuthContext auth_context;
@@ -799,3 +910,226 @@ DESTROY(addr)
 		krb5_free_address(context,addr);
 		freed((SV *)addr);
 	}
+
+MODULE = Authen::Krb5	PACKAGE = Authen::Krb5::Keyblock
+
+ 
+krb5_enctype
+enctype(keyblock)
+	Authen::Krb5::Keyblock keyblock
+
+        CODE:
+        RETVAL = keyblock->enctype;
+
+        OUTPUT:
+        RETVAL
+ 
+unsigned int
+length(keyblock)
+        Authen::Krb5::Keyblock keyblock
+
+        CODE:
+        RETVAL = keyblock->length;
+
+        OUTPUT:
+        RETVAL
+
+krb5_octet *
+contents(keyblock)
+        Authen::Krb5::Keyblock keyblock
+
+        CODE:
+        ST(0) = keyblock->contents
+	    ? sv_2mortal(newSVpv(keyblock->contents, keyblock->length))
+            : &PL_sv_undef;
+
+
+void
+DESTROY(keyblock)
+	Authen::Krb5::Keyblock	keyblock
+
+        CODE:
+	if (keyblock->contents) {
+		memset(keyblock->contents, 0, keyblock->length);
+		free(keyblock->contents);
+		keyblock->contents = NULL;
+	}
+
+MODULE = Authen::Krb5   PACKAGE = Authen::Krb5::Keytab
+
+void
+add_entry(keytab, entry)
+        Authen::Krb5::Keytab keytab
+        Authen::Krb5::KeytabEntry entry
+
+        CODE:
+        err = krb5_kt_add_entry(context, keytab, entry);
+	if (err)
+                XSRETURN_UNDEF;
+	XSRETURN_YES;
+
+void
+end_seq_get(keytab, cursor)
+        Authen::Krb5::Keytab keytab
+        krb5_kt_cursor *cursor
+
+        CODE:
+        err = krb5_kt_end_seq_get(context, keytab, cursor);
+        if (err)
+                XSRETURN_UNDEF;
+        XSRETURN_YES;
+
+Authen::Krb5::KeytabEntry
+get_entry(keytab, principal, vno = 0, enctype = 0)
+        Authen::Krb5::Keytab keytab
+        Authen::Krb5::Principal principal
+        krb5_kvno vno
+        krb5_enctype enctype
+
+        CODE:
+	if (!New(0, RETVAL, 1, krb5_keytab_entry))
+		XSRETURN_UNDEF;
+        err = krb5_kt_get_entry(context, keytab, principal, vno, enctype,
+            RETVAL);
+	if (err)
+		XSRETURN_UNDEF;
+        can_free((SV *)RETVAL);
+	
+	OUTPUT:
+	RETVAL
+        
+SV *
+get_name(keytab)
+        Authen::Krb5::Keytab keytab
+
+        PREINIT:
+        char name[MAX_KEYTAB_NAME_LEN+1];
+
+        CODE:
+        err = krb5_kt_get_name(context, keytab, name, MAX_KEYTAB_NAME_LEN);
+	if (err)
+                XSRETURN_UNDEF;
+	RETVAL = sv_2mortal(newSVpv(name, 0));
+        can_free((SV *)RETVAL);
+
+        OUTPUT:
+        RETVAL
+
+Authen::Krb5::KeytabEntry
+next_entry(keytab, cursor)
+        krb5_kt_cursor *cursor
+        Authen::Krb5::Keytab keytab
+
+        CODE:
+	if (!New(0, RETVAL, 1, krb5_keytab_entry))
+		XSRETURN_UNDEF;
+        err = krb5_kt_next_entry(context, keytab, RETVAL, cursor);
+	if (err)
+                XSRETURN_UNDEF;
+        can_free((SV *)RETVAL);
+
+        OUTPUT:
+        RETVAL
+
+void
+remove_entry(keytab, entry)
+        Authen::Krb5::Keytab keytab
+        Authen::Krb5::KeytabEntry entry
+
+        CODE:
+        err = krb5_kt_remove_entry(context, keytab, entry);
+	if (err)
+                XSRETURN_UNDEF;
+	XSRETURN_YES;
+
+krb5_kt_cursor *
+start_seq_get(keytab)
+        Authen::Krb5::Keytab keytab
+
+        CODE:
+	if (!New(0, RETVAL, 1, krb5_kt_cursor))
+		XSRETURN_UNDEF;
+        err = krb5_kt_start_seq_get(context, keytab, RETVAL);
+	if (err)
+                XSRETURN_UNDEF;
+
+        OUTPUT:
+        RETVAL
+
+void
+DESTROY(keytab)
+        Authen::Krb5::Keytab keytab
+
+        CODE:
+        if (keytab && should_free((SV *)keytab)) {
+                krb5_kt_close(context, keytab);
+                freed((SV *)keytab);
+        }
+
+MODULE = Authen::Krb5   PACKAGE = Authen::Krb5::KeytabEntry
+
+Authen::Krb5::KeytabEntry
+new(class, principal, vno, key)
+	char *class
+	Authen::Krb5::Principal principal
+	krb5_kvno vno
+        Authen::Krb5::Keyblock key
+
+	CODE:
+	if (!New(0, RETVAL, 1, krb5_keytab_entry))
+		XSRETURN_UNDEF;
+        *RETVAL = keytab_entry_init;
+	RETVAL->principal = principal;
+	RETVAL->vno = vno;
+        RETVAL->key = *key;
+
+        can_free((SV *)RETVAL);
+	
+	OUTPUT:
+	RETVAL
+
+Authen::Krb5::Principal
+principal(entry)
+	Authen::Krb5::KeytabEntry entry
+
+        CODE:
+        err = krb5_copy_principal(context, entry->principal, &RETVAL);
+        if (err)
+                XSRETURN_UNDEF;
+        can_free((SV *)RETVAL);
+
+        OUTPUT:
+        RETVAL
+
+krb5_timestamp
+timestamp(entry)
+	Authen::Krb5::KeytabEntry entry
+
+        CODE:
+        RETVAL = entry->timestamp;
+
+        OUTPUT:
+        RETVAL
+ 
+krb5_kvno
+kvno(entry)
+	Authen::Krb5::KeytabEntry entry
+
+        CODE:
+        RETVAL = entry->vno;
+
+        OUTPUT:
+        RETVAL
+ 
+Authen::Krb5::Keyblock
+key(entry)
+	Authen::Krb5::KeytabEntry entry
+
+        CODE:
+        err = krb5_copy_keyblock(context, &entry->key, &RETVAL);
+        if (err)
+                XSRETURN_UNDEF;
+        can_free((SV *)RETVAL);
+
+        OUTPUT:
+        RETVAL
