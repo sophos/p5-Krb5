@@ -28,6 +28,7 @@ krb5_timestamp		T_INT
 krb5_ui_4		T_INT
 krb5_enctype            T_INT
 krb5_kt_cursor *        T_PTROBJ_NU
+krb5_cc_cursor *        T_PTROBJ_NU
 krb5_kvno               T_U_INT
 
 INPUT

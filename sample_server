@@ -3,7 +3,7 @@
 # sample_server
 # receives authentication info from a client using recvauth
 
-use blib;
+use blib; # remove if not in module build directory
 use IO::Socket;
 use Sys::Hostname;
 use Authen::Krb5 (KRB5_NT_SRV_HST);
@@ -15,7 +15,6 @@ $KEYTAB_FILE = "/etc/krb5.keytab";
 chomp($SERVER = hostname());
 
 Authen::Krb5::init_context();
-Authen::Krb5::init_ets();
 
 $ac = new Authen::Krb5::AuthContext;
 

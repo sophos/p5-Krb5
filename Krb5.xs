@@ -29,6 +29,7 @@ typedef krb5_address		*Authen__Krb5__Address;
 typedef krb5_keyblock		*Authen__Krb5__Keyblock;
 typedef krb5_keytab_entry	*Authen__Krb5__KeytabEntry;
 typedef krb5_kt_cursor          *Authen__Krb5__KeytabCursor;
+typedef krb5_cc_cursor          *Authen__Krb5__CcacheCursor;
 typedef krb5_keyblock		*Authen__Krb5__KeyBlock;
 
 static krb5_context context = 0;
@@ -123,7 +124,9 @@ void
 krb5_init_ets()
 
 	CODE:
+#if KRB5_DEPRECATED
 	krb5_init_ets(context);
+#endif /* KRB5_DEPRECATED */
 	XSRETURN_YES;
 
 void
@@ -599,7 +602,7 @@ initialize(cc, p)
 		XSRETURN_YES;
 	}
 
-char *
+const char *
 get_name(cc)
 	Authen::Krb5::Ccache cc
 
@@ -637,6 +640,47 @@ destroy(cc)
 		freed((SV*)cc);
 		XSRETURN_YES;
 	}
+
+krb5_cc_cursor *
+start_seq_get(cc)
+	Authen::Krb5::Ccache cc
+
+	CODE:
+	if (!New(0, RETVAL, 1, krb5_cc_cursor))
+		XSRETURN_UNDEF;
+        err = krb5_cc_start_seq_get(context, cc, RETVAL);
+	if (err)
+                XSRETURN_UNDEF;
+
+        OUTPUT:
+        RETVAL
+
+Authen::Krb5::Creds
+next_cred(cc, cursor)
+        krb5_cc_cursor *cursor
+        Authen::Krb5::Ccache cc
+
+        CODE:
+	if (!New(0, RETVAL, 1, krb5_creds))
+		XSRETURN_UNDEF;
+        err = krb5_cc_next_cred(context, cc, cursor, RETVAL);
+	if (err)
+                XSRETURN_UNDEF;
+        can_free((SV *)RETVAL);
+
+        OUTPUT:
+        RETVAL
+
+void
+end_seq_get(cc, cursor)
+        Authen::Krb5::Ccache cc
+        krb5_cc_cursor *cursor
+
+        CODE:
+        err = krb5_cc_end_seq_get(context, cc, cursor);
+        if (err)
+                XSRETURN_UNDEF;
+        XSRETURN_YES;
 
 void
 DESTROY(cc)

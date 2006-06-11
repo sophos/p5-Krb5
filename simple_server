@@ -3,7 +3,7 @@
 # simple_server
 # uses rd_req & rd_priv to decrypt an authentic encrypted message
 
-use blib;
+use blib; # remove if not in module build directory
 use IO::Socket;
 use Sys::Hostname;
 use Authen::Krb5 (ADDRTYPE_INET,ADDRTYPE_IPPORT,KRB5_NT_SRV_HST);
@@ -15,7 +15,6 @@ $KEYTAB_FILE = "/etc/krb5.keytab";
 chomp($SERVER = hostname());
 
 Authen::Krb5::init_context();
-Authen::Krb5::init_ets();
 
 $ac = new Authen::Krb5::AuthContext;
 

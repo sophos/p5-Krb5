@@ -3,7 +3,7 @@
 # simple_client
 # uses mk_req & mk_priv to send an authenticated and encrypted message
 
-use blib;
+use blib; # remove if not in module build directory
 use IO::Socket;
 use Authen::Krb5 (ADDRTYPE_INET,ADDRTYPE_IPPORT);
 
@@ -12,7 +12,6 @@ $SERVICE = "sample";
 $SERVER = "server.domain.edu";
 
 Authen::Krb5::init_context();
-Authen::Krb5::init_ets();
 
 $ac = new Authen::Krb5::AuthContext;
 

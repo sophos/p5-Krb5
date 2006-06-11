@@ -1,5 +1,10 @@
 Revision history for Perl extension Krb5.
 
+1.6	Add methods for iterating through credentials cache
+        (mbrown@fensystems.co.uk)
+	Deprecated init_ets
+	Fix some compiler warnings
+
 1.5	Fix broken compile for Authen::Krb5::Keytab::get_name()
 
 1.4	Added methods for manipulating keytabs (ajk@iu.edu)

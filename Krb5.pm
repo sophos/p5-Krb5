@@ -52,7 +52,7 @@ require AutoLoader;
 	KRB5_NT_UNKNOWN
 	KRB5_TGS_NAME
 );
-$VERSION = '1.5';
+$VERSION = '1.6';
 
 sub KRB5_TGS_NAME() { return "krbtgt"; }
 
@@ -95,7 +95,6 @@ Authen::Krb5 - Perl extension for Kerberos 5
 use Authen::Krb5;
 
 Authen::Krb5::init_context();
-Authen::Krb5::init_ets();
 
 =head1 DESCRIPTION
 
@@ -117,10 +116,9 @@ error.
 =item init_context()
 
 Initializes a context for the application.  Returns a Authen::Krb5::Context
-object, or undef if there was an error.  Should be called along with init_ets
-at the beginning of a script.
+object, or undef if there was an error.
 
-=item init_ets()
+=item init_ets() (DEPRECATED)
 
 Initializes the Kerberos error tables.  Should be called along with
 init_context at the beginning of a script.
@@ -335,6 +333,21 @@ Returns the primary principal of the credentials cache.
 =item o destroy
 
 Destroys the credentials cache and releases all resources it used.
+
+=item o start_seq_get()
+
+Returns a cursor that can be passed to I<next_cred()> to read in turn
+every credential in the cache.
+
+=item o next_cred(cursor)
+
+Returns the next credential in the cache as an Authen::Krb5::Creds
+object.
+
+=item o end_seq_get(cursor)
+
+Perform cleanup opreations after I<next_cred()> and invalidates
+I<cursor>.
 
 =back
 
