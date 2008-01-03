@@ -52,7 +52,7 @@ require AutoLoader;
 	KRB5_NT_UNKNOWN
 	KRB5_TGS_NAME
 );
-$VERSION = '1.6';
+$VERSION = '1.7';
 
 sub KRB5_TGS_NAME() { return "krbtgt"; }
 
@@ -188,21 +188,48 @@ I<name> is undef) for a key matching I<principal> (and optionally
 I<kvno> and I<enctype>) and returns the key in the form of an
 Authen::Krb5::Keyblock object.
 
+=item get_init_creds_password(client, password[, service])
+
+Attempt to get an initial ticket for the client.  'client' is a principal
+object for which you want an initial ticket.  'password' is the password for
+the client.  'service', if given, is the string representation (not a
+principal object) for the ticket to acquire.  If not given, it defaults to
+krbtgt/REALM@REALM for the local realm.  Returns an Authen::Krb5::Creds
+object or undef on failure.
+
+=item get_init_creds_keytab(client, keytab[, service])
+
+Attempt to get an inintial ticket for the client using a keytab.  'client'
+is a principal object for which you want an initial ticket.  'keytab' is a
+keytab object created with kt_resolve.  'service', if given, is the string
+representation (not a principal object) for the ticket to acquire.  If not
+given, it defaults to krbtgt/REALM@REALM for the local realm.  Returns an
+Authen::Krb5::Creds object or undef on failure.
+
 =item get_in_tkt_with_password(client,server,password,cc)
 
 Attempt to get an initial ticket for the client.  'client' is a principal
 object for which you want an initial ticket.  'server' is a principal object
-for the service (usually krbtgt/REALM@REALM).  'password' is the password for
-the client, and 'cc' is a Authen::Krb5::Ccache object representing the current
-credentials cache.  Returns a Kerberos error code.
+for the service (usually krbtgt/REALM@REALM).  'password' is the password
+for the client, and 'cc' is a Authen::Krb5::Ccache object representing the
+current credentials cache.  Returns a Kerberos error code.
+
+Although this interface is deprecated in the Kerberos C libraries, it's
+supported in the Perl module.  In this module, it's implemented in terms of
+krb5_get_init_creds_password, krb5_cc_initialize, and krb5_cc_store_cred.
 
 =item get_in_tkt_with_keytab(client,server,keytab,cc)
 
 Obtain an initial ticket for the client using a keytab.  'client' is a
-principal object for which you want an initial ticket.  'server' is a principal
-object for the service (usually krbtgt/REALM@REALM).  'keytab' is a keytab
-object createed with kt_resolve.  'cc' is a Authen::Krb5::Ccache object
-representing the current credentials cache.  Returns a Kerberos error code.
+principal object for which you want an initial ticket.  'server' is a
+principal object for the service (usually krbtgt/REALM@REALM).  'keytab' is
+a keytab object createed with kt_resolve.  'cc' is a Authen::Krb5::Ccache
+object representing the current credentials cache.  Returns a Kerberos error
+code.
+
+Although this interface is deprecated in the Kerberos C libraries, it's
+supported in the Perl module.  In this module, it's implemented in terms of
+krb5_get_init_creds_keytab, krb5_cc_initialize, and krb5_cc_store_cred.
 
 =item mk_req(auth_context,ap_req_options,service,hostname,in,cc)
 
@@ -321,6 +348,12 @@ Kerberos 5 credentials cache object.
 
 Creates/refreshes a credentials cache for the primary principal 'p'.  If the
 cache already exists, its contents are destroyed.
+
+=item o store_cred(creds)
+
+Stores the given credentials, which should be an Authen::Krb5::Creds object
+as returned from get_init_creds_password() or get_init_creds_keytab(), in
+the cache.
 
 =item o get_name
 

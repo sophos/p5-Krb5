@@ -6,6 +6,7 @@ extern "C" {
 #include "XSUB.h"
 #include <krb5.h>
 #include <com_err.h>
+#include <errno.h>
 #include "krb5_constants.c"
 
 #ifdef __cplusplus
@@ -32,7 +33,7 @@ typedef krb5_kt_cursor          *Authen__Krb5__KeytabCursor;
 typedef krb5_cc_cursor          *Authen__Krb5__CcacheCursor;
 typedef krb5_keyblock		*Authen__Krb5__KeyBlock;
 
-static krb5_context context = 0;
+static krb5_context context = NULL;
 static krb5_error_code err;
 static krb5_keytab_entry keytab_entry_init;
 
@@ -119,6 +120,7 @@ krb5_free_context()
 	CODE:
 	if (!context) croak("Authen::Krb5 not yet initialized");
 	krb5_free_context(context);
+        context = NULL;
 
 void
 krb5_init_ets()
@@ -310,6 +312,68 @@ krb5_kt_read_service_key(name, principal, kvno = 0, enctype = 0)
         OUTPUT:
         RETVAL
 
+Authen::Krb5::Creds
+krb5_get_init_creds_password(client, password, service = NULL)
+	Authen::Krb5::Principal client
+	char *password
+	char *service
+
+	PREINIT:
+	krb5_get_init_creds_opt opt;
+
+	CODE:
+	if (service != NULL && service[0] == '\0') service = NULL;
+	RETVAL = calloc(1, sizeof(krb5_creds));
+	if (RETVAL == NULL) {
+		err = errno;
+		XSRETURN_UNDEF;
+	}
+	krb5_get_init_creds_opt_init(&opt);
+
+	err = krb5_get_init_creds_password(context, RETVAL, client, password,
+		NULL, NULL, 0, service, &opt);
+	if (err) {
+		free(RETVAL);
+		XSRETURN_UNDEF;
+	}
+	can_free((SV *)RETVAL);
+
+	OUTPUT:
+	RETVAL
+
+Authen::Krb5::Creds
+krb5_get_init_creds_keytab(client, keytab, service = NULL)
+	Authen::Krb5::Principal client
+	Authen::Krb5::Keytab keytab
+	char *service
+
+	PREINIT:
+	krb5_get_init_creds_opt opt;
+
+	CODE:
+	if (service != NULL && service[0] == '\0') service = NULL;
+	RETVAL = calloc(1, sizeof(krb5_creds));
+	if (RETVAL == NULL) {
+		err = errno;
+		XSRETURN_UNDEF;
+	}
+	krb5_get_init_creds_opt_init(&opt);
+
+	err = krb5_get_init_creds_keytab(context, RETVAL, client, keytab, 0,
+		service, &opt);
+	if (err) {
+		free(RETVAL);
+		XSRETURN_UNDEF;
+	}
+	can_free((SV *)RETVAL);
+
+	OUTPUT:
+	RETVAL
+
+
+ # These are legacy interfaces which are deprecated in the current MIT
+ # Kerberos.  Reimplement them in terms of the new get_init_creds
+ # interfaces rather than call the deprecated functions.
 void
 krb5_get_in_tkt_with_password(client, server, password, cc)
 	Authen::Krb5::Principal client
@@ -319,49 +383,69 @@ krb5_get_in_tkt_with_password(client, server, password, cc)
 
 	PREINIT:
 	krb5_creds cr;
-	krb5_timestamp now;
-	krb5_deltat lifetime = 0;
+	krb5_get_init_creds_opt opt;
+	char *service;
 
 	CODE:
 	memset((char *)&cr,0,sizeof(krb5_creds));
-	krb5_timeofday(context, &now);
-	cr.client = client;
-	cr.server = server;
-	cr.times.starttime = now;
-	cr.times.endtime = now + KRB5_DEFAULT_LIFE;
-	cr.times.renew_till = 0;
-
-	err = krb5_get_in_tkt_with_password(context, 0, 0, NULL, NULL,
-		password, cc, &cr, 0);
-
+	krb5_get_init_creds_opt_init(&opt);
+	err = krb5_unparse_name(context, server, &service);
 	if (err) XSRETURN_UNDEF;
+
+	err = krb5_get_in_tkt_with_password(context, &cr, client, password,
+		NULL, NULL, 0, service, &opt);
+	free(service);
+	if (err) XSRETURN_UNDEF;
+
+	err = krb5_cc_initialize(context, cc, client);
+	if (err) {
+		krb5_free_cred_contents(context, &cr);
+		XSRETURN_UNDEF;
+	}
+	err = krb5_cc_store_cred(context, cc, &cr);
+	if (err) {
+		krb5_free_cred_contents(context, &cr);
+		XSRETURN_UNDEF;
+	}
+	krb5_free_cred_contents(context, &cr);
+
 	XSRETURN_YES;
 
 void
 krb5_get_in_tkt_with_keytab(client, server, keytab, cc)
 	Authen::Krb5::Principal client
 	Authen::Krb5::Principal server
-	Authen::Krb5::Keytab    keytab
+	Authen::Krb5::Keytab keytab
 	Authen::Krb5::Ccache cc
 
 	PREINIT:
 	krb5_creds cr;
-	krb5_timestamp now;
-	krb5_deltat lifetime = 0;
+	krb5_get_init_creds_opt opt;
+	char *service;
 
 	CODE:
-	memset((char *)&cr,0,sizeof(krb5_creds));
-	krb5_timeofday(context, &now);
-	cr.client = client;
-	cr.server = server;
-	cr.times.starttime = now;
-	cr.times.endtime = now + KRB5_DEFAULT_LIFE;
-	cr.times.renew_till = 0;
-
-	err = krb5_get_in_tkt_with_keytab(context, 0, 0, NULL, NULL,
-		keytab, cc, &cr, 0);
-
+	memset(&cr,0,sizeof(krb5_creds));
+	krb5_get_init_creds_opt_init(&opt);
+	err = krb5_unparse_name(context, server, &service);
 	if (err) XSRETURN_UNDEF;
+
+	err = krb5_get_init_creds_keytab(context, &cr, client, keytab, 0,
+		service, &opt);
+	free(service);
+	if (err) XSRETURN_UNDEF;
+
+	err = krb5_cc_initialize(context, cc, client);
+	if (err) {
+		krb5_free_cred_contents(context, &cr);
+		XSRETURN_UNDEF;
+	}
+	err = krb5_cc_store_cred(context, cc, &cr);
+	if (err) {
+		krb5_free_cred_contents(context, &cr);
+		XSRETURN_UNDEF;
+	}
+	krb5_free_cred_contents(context, &cr);
+
 	XSRETURN_YES;
 
 SV *
@@ -601,6 +685,16 @@ initialize(cc, p)
 		can_free((SV *)cc);
 		XSRETURN_YES;
 	}
+
+void
+store_cred(cc, creds)
+	Authen::Krb5::Ccache cc
+	Authen::Krb5::Creds creds
+
+	CODE:
+	err = krb5_cc_store_cred(context, cc, creds);
+	if (err) XSRETURN_UNDEF;
+	XSRETURN_YES;
 
 const char *
 get_name(cc)
@@ -1177,3 +1271,16 @@ key(entry)
 
         OUTPUT:
         RETVAL
+
+MODULE = Authen::Krb5   PACKAGE = Authen::Krb5::Creds
+
+void
+DESTROY(creds)
+        Authen::Krb5::Creds creds
+
+        CODE:
+        if (creds && should_free((SV *)creds)) {
+                krb5_free_cred_contents(context, creds);
+                free(creds);
+                freed((SV *)creds);
+        }
