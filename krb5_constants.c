@@ -1,11 +1,3 @@
-static int
-not_here(s)
-char *s;
-{
-    croak("%s not implemented on this architecture", s);
-    return -1;
-}
-
 static double
 constant(name, arg)
 char *name;
@@ -1366,18 +1358,6 @@ int arg;
 #else
 	    goto not_there;
 #endif
-	if (strEQ(name, "KRB5_CALLCONV"))
-#ifdef KRB5_CALLCONV
-	    return KRB5_CALLCONV;
-#else
-	    goto not_there;
-#endif
-	if (strEQ(name, "KRB5_CALLCONV_C"))
-#ifdef KRB5_CALLCONV_C
-	    return KRB5_CALLCONV_C;
-#else
-	    goto not_there;
-#endif
 	if (strEQ(name, "KRB5_CCACHE_BADVNO"))
 #ifdef KRB5_CCACHE_BADVNO
 	    return KRB5_CCACHE_BADVNO;
@@ -1555,12 +1535,6 @@ int arg;
 	if (strEQ(name, "KRB5_GC_USER_USER"))
 #ifdef KRB5_GC_USER_USER
 	    return KRB5_GC_USER_USER;
-#else
-	    goto not_there;
-#endif
-	if (strEQ(name, "KRB5_GENERAL__"))
-#ifdef KRB5_GENERAL__
-	    return KRB5_GENERAL__;
 #else
 	    goto not_there;
 #endif
@@ -3040,24 +3014,6 @@ int arg;
     case 'z':
 	break;
     case '_':
-	if (strEQ(name, "_MACINTOSH"))
-#ifdef _MACINTOSH
-	    return _MACINTOSH;
-#else
-	    goto not_there;
-#endif
-	if (strEQ(name, "_SIZET"))
-#ifdef _SIZET
-	    return _SIZET;
-#else
-	    goto not_there;
-#endif
-	if (strEQ(name, "_SIZE_T_DEFINED"))
-#ifdef _SIZE_T_DEFINED
-	    return _SIZE_T_DEFINED;
-#else
-	    goto not_there;
-#endif
 	break;
     }
     errno = EINVAL;

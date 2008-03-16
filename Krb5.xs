@@ -4,6 +4,9 @@ extern "C" {
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+
+/* We currently provide some private functions and probably shouldn't. */
+#define KRB5_PRIVATE 1
 #include <krb5.h>
 #include <com_err.h>
 #include <errno.h>
@@ -36,6 +39,14 @@ typedef krb5_keyblock		*Authen__Krb5__KeyBlock;
 static krb5_context context = NULL;
 static krb5_error_code err;
 static krb5_keytab_entry keytab_entry_init;
+
+/*
+ * These are internal Kerberos library functions that aren't prototyped and
+ * that we probably shouldn't be calling.  Prototype them with the arguments
+ * we expect and leave them for now pending an API cleanup.
+ */
+krb5_error_code krb5_free_krbhst(krb5_context, char * const *);
+krb5_error_code krb5_get_krbhst(krb5_context, const krb5_data *, char ***);
 
 /*
  * The following three routines implement a "safehouse" for nested Kerberos
@@ -100,7 +111,7 @@ krb5_error(e = 0)
 	}
 	else {
 		ST(0) = sv_2mortal(newSVpv((char *)error_message(err), 0));
-		SvUPGRADE(ST(0), SVt_PVIV);
+		(void) SvUPGRADE(ST(0), SVt_PVIV);
 		SvIVX(ST(0)) = err;
 		SvIOK_on(ST(0));
 	}
@@ -275,7 +286,7 @@ krb5_kt_resolve(string_name)
 	OUTPUT:
 	RETVAL
 
-char *
+SV *
 krb5_kt_default_name()
         CODE:
         char name[BUFSIZ];
@@ -283,7 +294,10 @@ krb5_kt_default_name()
 	if (err)
                 XSRETURN_UNDEF;
         name[sizeof name - 1] = '\0';
-	ST(0) = sv_2mortal(newSVpv(name, 0));
+	RETVAL = newSVpv(name, 0);
+
+	OUTPUT:
+        RETVAL
 
 Authen::Krb5::Keytab
 krb5_kt_default()
@@ -292,8 +306,8 @@ krb5_kt_default()
 	if (err)
                 XSRETURN_UNDEF;
 
-        OUTPUT:
-        RETVAL
+	OUTPUT:
+	RETVAL
 
 Authen::Krb5::Keyblock
 krb5_kt_read_service_key(name, principal, kvno = 0, enctype = 0)
@@ -392,7 +406,7 @@ krb5_get_in_tkt_with_password(client, server, password, cc)
 	err = krb5_unparse_name(context, server, &service);
 	if (err) XSRETURN_UNDEF;
 
-	err = krb5_get_in_tkt_with_password(context, &cr, client, password,
+	err = krb5_get_init_creds_password(context, &cr, client, password,
 		NULL, NULL, 0, service, &opt);
 	free(service);
 	if (err) XSRETURN_UNDEF;
@@ -480,7 +494,6 @@ krb5_rd_req(auth_context,in,server,keytab=0)
 	PREINIT:
 	krb5_data in_data;
 	krb5_ticket *t;
-	krb5_flags ap_req_options;
 
 	CODE:
 	if (!New(0,t,1,krb5_ticket)) XSRETURN_UNDEF;
@@ -948,9 +961,6 @@ Authen::Krb5::KeyBlock
 getkey(auth_context)
 	Authen::Krb5::AuthContext auth_context;
 
-	PREINIT:
-	SV *sv;
-
 	CODE:
 	err = krb5_auth_con_getkey(context, auth_context, &RETVAL);
 	if (err) XSRETURN_UNDEF;
@@ -1072,15 +1082,17 @@ length(keyblock)
         OUTPUT:
         RETVAL
 
-krb5_octet *
+SV *
 contents(keyblock)
         Authen::Krb5::Keyblock keyblock
 
-        CODE:
-        ST(0) = keyblock->contents
-	    ? sv_2mortal(newSVpv(keyblock->contents, keyblock->length))
-            : &PL_sv_undef;
+	CODE:
+	if (keyblock->contents == NULL)
+		XSRETURN_UNDEF;
+	RETVAL = newSVpv((char *) keyblock->contents, keyblock->length);
 
+	OUTPUT:
+	RETVAL
 
 void
 DESTROY(keyblock)

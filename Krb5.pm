@@ -52,7 +52,7 @@ require AutoLoader;
 	KRB5_NT_UNKNOWN
 	KRB5_TGS_NAME
 );
-$VERSION = '1.7';
+$VERSION = '1.8';
 
 sub KRB5_TGS_NAME() { return "krbtgt"; }
 
@@ -560,7 +560,7 @@ contained in the entry.
 
 =head1 AUTHOR
 
-Jeff Horwitz (jeff@laserlink.net)
+Jeff Horwitz (jeff@smashing.org)
 
 =head1 ACKNOWLEDGEMENTS
 

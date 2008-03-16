@@ -1,5 +1,9 @@
 Revision history for Perl extension Krb5.
 
+1.8     Fix broken get_in_tkt_with_password implementation (rra@debian.org)
+        Add some missing prototypes (rra@debian.org)
+        Clean up some compiler warnings (rra@debian.org)
+
 1.7     Use standard search paths for includes and libs
         Add get_init_creds_password (rra@debian.org)
         Add get_init_creds_keytab (rra@debian.org)
