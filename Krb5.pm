@@ -52,7 +52,7 @@ require AutoLoader;
 	KRB5_NT_UNKNOWN
 	KRB5_TGS_NAME
 );
-$VERSION = '1.8';
+$VERSION = '1.9';
 
 sub KRB5_TGS_NAME() { return "krbtgt"; }
 
@@ -555,6 +555,47 @@ The key version number of the key contained in the entry.
 
 An Authen::Krb5::Keyblock object representing a copy of the keyblock
 contained in the entry.
+
+=back
+
+=item Authen::Krb5::Creds
+
+Object representing a credential.
+
+=over 4
+
+=item o starttime()
+
+Returns the starttime time property of the credential.
+
+=item o authtime()
+
+Returns the authtime time property of the credential.
+
+=item o endtime()
+
+Returns the endtime time property of the credential.
+
+=item o renew_till()
+
+Returns the renew_till time property of the credential.
+
+=item o server()
+
+Returns the name of the service principal the credential is for.
+
+=item o client()
+
+Returns the client principal name (will usually be identical for all
+credentials in a credential cache).
+
+=item o ticket()
+
+Returns the Authen::Krb5::Ticket for this credential.
+
+=item o keyblock()
+
+Returns the keyblock of the credential.
 
 =back
 

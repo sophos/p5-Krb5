@@ -8,7 +8,12 @@ extern "C" {
 /* We currently provide some private functions and probably shouldn't. */
 #define KRB5_PRIVATE 1
 #include <krb5.h>
-#include <com_err.h>
+
+/* Recent versions of Kerberos include com_err on their own.  Uncomment if you
+ * have an older version and the complier complains about missing headers.
+ */
+/* #include <com_err.h> */
+
 #include <errno.h>
 #include "krb5_constants.c"
 
@@ -1285,6 +1290,123 @@ key(entry)
         RETVAL
 
 MODULE = Authen::Krb5   PACKAGE = Authen::Krb5::Creds
+
+krb5_timestamp
+starttime(cred)
+	Authen::Krb5::Creds cred
+
+	CODE:
+	if (!cred->times.starttime)
+            cred->times.starttime = cred->times.authtime;
+        RETVAL = cred->times.starttime;
+
+	OUTPUT:
+	RETVAL
+
+krb5_timestamp
+authtime(cred)
+	Authen::Krb5::Creds cred
+
+	CODE:
+	RETVAL = cred->times.authtime;
+
+        OUTPUT:
+        RETVAL
+
+krb5_timestamp
+endtime(cred)
+	Authen::Krb5::Creds cred
+
+	CODE:
+	RETVAL = cred->times.endtime;
+
+	OUTPUT:
+	RETVAL
+
+krb5_timestamp
+renew_till(cred)
+	Authen::Krb5::Creds cred
+
+	CODE:
+	RETVAL = cred->times.renew_till;
+
+	OUTPUT:
+	RETVAL
+
+char *
+server(cred)
+	Authen::Krb5::Creds cred
+
+	PREINIT:
+	krb5_error_code retval;
+	char *sname;
+
+	CODE:
+	retval = krb5_unparse_name(context, cred->server, &sname);
+	if (retval) {
+	    com_err("Authen::Krb5::Creds", retval, "while unparsing server name");
+            return;
+	}
+
+	RETVAL = sname;
+
+	OUTPUT:
+	RETVAL
+
+char *
+client(cred)
+	Authen::Krb5::Creds cred
+
+	PREINIT:
+	krb5_error_code retval;
+	char *name;
+
+	CODE:
+	retval = krb5_unparse_name(context, cred->client, &name);
+	if (retval) {
+	    com_err("Authen::Krb5::Creds", retval, "while unparsing client name");
+            return;
+	}
+
+	RETVAL = name;
+
+	OUTPUT:
+	RETVAL
+
+Authen::Krb5::Ticket
+ticket(cred)
+	Authen::Krb5::Creds cred
+
+	PREINIT:
+	krb5_error_code retval;
+	krb5_ticket *t;
+
+	CODE:	
+	if (!New(0,t,1,krb5_ticket)) XSRETURN_UNDEF;
+
+	retval = krb5_decode_ticket(&cred->ticket, &t);
+
+	RETVAL = t;
+
+	can_free((SV *)RETVAL);
+
+	OUTPUT:
+	RETVAL
+
+Authen::Krb5::Keyblock
+keyblock(cred)
+	Authen::Krb5::Creds cred
+
+	CODE:
+	RETVAL = &cred->keyblock;
+
+        can_free((SV *)RETVAL);
+
+	OUTPUT:
+	RETVAL
+
+# TODO: Authen::Krb5::Address
+# addresses(cred)
 
 void
 DESTROY(creds)

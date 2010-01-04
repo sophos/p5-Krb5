@@ -1,5 +1,7 @@
 Revision history for Perl extension Krb5.
 
+1.9	Add Authen::Krb5::Creds object (tom.jones@oucs.ox.ac.uk)
+
 1.8     Fix broken get_in_tkt_with_password implementation (rra@debian.org)
         Add some missing prototypes (rra@debian.org)
         Clean up some compiler warnings (rra@debian.org)

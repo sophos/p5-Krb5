@@ -2,6 +2,10 @@ Krb5 provides an object oriented interface to the most commonly used
 functions included in the Kerberos 5 API.  It was developed and tested
 using Perl 5.005_03 and MIT Kerberos 5 version 1.0.5 and 1.1.1.
 
+NOTE: This module is very out of date, though it should still work with recent
+Kerberos 5 libraries.  Version 2.0 will be a well deserved, complete rewrite.
+Following version 1.9, only bug fixes will be released for the 1.x series.
+
 Your comments and bug reports are welcome.  Please send them to me at
 jeff@smashing.org.
 
