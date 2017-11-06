@@ -46,14 +46,6 @@ static krb5_error_code err;
 static krb5_keytab_entry keytab_entry_init;
 
 /*
- * These are internal Kerberos library functions that aren't prototyped and
- * that we probably shouldn't be calling.  Prototype them with the arguments
- * we expect and leave them for now pending an API cleanup.
- */
-krb5_error_code krb5_free_krbhst(krb5_context, char * const *);
-krb5_error_code krb5_get_krbhst(krb5_context, const krb5_data *, char ***);
-
-/*
  * The following three routines implement a "safehouse" for nested Kerberos
  * data structures which shouldn't be freed before their parent data
  * structures are freed.  Without this, "Bad free() ignored" errors as well
@@ -175,26 +167,6 @@ krb5_get_host_realm(host)
 			strlen(realmlist[i]))));
 	}
 	krb5_free_host_realm(context,realmlist);
-
-void
-krb5_get_krbhst(realm)
-	char *realm
-
-	PREINIT:
-	krb5_data realm_data;
-	char **hostlist;
-	int i;
-
-	PPCODE:
-	realm_data.data = realm;
-	realm_data.length = strlen(realm);
-	err = krb5_get_krbhst(context,&realm_data,&hostlist);
-	if (err || !hostlist) XSRETURN_UNDEF;
-	for (i = 0; hostlist[i]; i++) {
-		XPUSHs(sv_2mortal(newSVpv(hostlist[i],
-			strlen(hostlist[i]))));
-	}
-	krb5_free_krbhst(context,hostlist);
 
 Authen::Krb5::Principal
 krb5_build_principal_ext(p)
