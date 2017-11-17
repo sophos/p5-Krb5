@@ -59,6 +59,14 @@ sub new {
     $args{extra_linker_flags} = $ldflags;
     print "LDFLAGS: $args{extra_linker_flags}\n";
 
+    # TODO need to be able to override travis-perl-helpers options to Devel::Cover
+    # Currently we end up with coverage reports for CORE/inline.h and other system headers
+    # if ($ENV{COVERAGE}) {
+    #     print "Adding coverage flags\n";
+    #     $args{extra_compiler_flags} .= ' --coverage';
+    #     $args{extra_linker_flags}   .= ' --coverage';
+    # }
+
     my $builder = Module::Build->new(%args);
 
     return $builder;
