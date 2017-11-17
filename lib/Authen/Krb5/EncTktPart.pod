@@ -1,0 +1,6 @@
+# PODNAME: Authen::Krb5::EncTktPart
+# ABSTRACT: Object representation of the krb5_enc_tkt_part structure.
+
+=method C<client()>
+
+The client principal contained in the ticket.

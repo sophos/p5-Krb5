@@ -1,0 +1,40 @@
+# PODNAME: Authen::Krb5::Ccache
+# ABSTRACT: Kerberos 5 credentials cache object.
+
+=method C<initialize(p)>
+
+Creates/refreshes a credentials cache for the primary principal 'p'.  If the
+cache already exists, its contents are destroyed.
+
+=method C<store_cred(creds)>
+
+Stores the given credentials, which should be an Authen::Krb5::Creds object
+as returned from get_init_creds_password() or get_init_creds_keytab(), in
+the cache.
+
+=method C<get_name>
+
+Returns the name of the credentials cache.
+
+=method C<get_principal>
+
+Returns the primary principal of the credentials cache.
+
+=method C<destroy>
+
+Destroys the credentials cache and releases all resources it used.
+
+=method C<start_seq_get()>
+
+Returns a cursor that can be passed to I<next_cred()> to read in turn
+every credential in the cache.
+
+=method C<next_cred(cursor)>
+
+Returns the next credential in the cache as an Authen::Krb5::Creds
+object.
+
+=method C<end_seq_get(cursor)>
+
+Perform cleanup opreations after I<next_cred()> and invalidates
+I<cursor>.

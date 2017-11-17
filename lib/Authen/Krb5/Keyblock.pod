@@ -1,0 +1,14 @@
+# PODNAME: Authen::Krb5::Keyblock
+# ABSTRACT: Object representation of the krb5_keyblock structure.
+
+=method C<enctype()>
+
+The integral enctype of the key.
+
+=method C<length()>
+
+Length of the key.
+
+=method C<contents()>
+
+Contents of the key itself, as a string.

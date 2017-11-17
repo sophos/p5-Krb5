@@ -1,0 +1,15 @@
+# PODNAME: Authen::Krb5::Principal
+# ABSTRACT: Kerberos 5 princpal object.
+
+=method C<realm()>
+
+Returns the realm of the principal.
+
+=method C<type()>
+
+Returns the type of the principal.
+
+=method C<data()>
+
+Returns a list containing the components of the principal (everything before
+the realm).

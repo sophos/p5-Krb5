@@ -1,0 +1,11 @@
+# PODNAME: Authen::Krb5::Ticket
+# ABSTRACT: Kerberos 5 ticket object.
+
+=method C<server()>
+
+Returns the server stored in the ticket.
+
+=method C<enc_part2()>
+
+Returns a L<Authen::Krb5::EncTktPart> object representation of the ticket data.
+See below.

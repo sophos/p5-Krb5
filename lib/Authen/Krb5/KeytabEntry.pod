@@ -1,0 +1,26 @@
+# PODNAME: Authen::Krb5::KeytabEntry
+# ABSTRACT: Entry in a Kerberos Keytab
+
+=method C<new(principal, kvno, keyblock)>
+
+Create a new Authen::Krb5::KeytabEntry object from an
+Authen::Krb5::Principal object, a key version number, and an
+Authen::Krb5::Keyblock object.
+
+=method C<principal>
+
+An Authen::Krb5::Principal object representing the principal contained
+in the entry.
+
+=method C<timestamp>
+
+The timestamp of the entry.
+
+=method C<kvno>
+
+The key version number of the key contained in the entry.
+
+=method C<key>
+
+An Authen::Krb5::Keyblock object representing a copy of the keyblock
+contained in the entry.

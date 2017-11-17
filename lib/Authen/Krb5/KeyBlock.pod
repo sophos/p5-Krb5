@@ -1,0 +1,18 @@
+# PODNAME: Authen::Krb5::KeyBlock
+# ABSTRACT: Kerberos 5 keyblock object.
+
+=method C<enctype()>
+
+Returns the encryption type ID.
+
+=method C<enctype_string()>
+
+Returns a text description of the encryption type.
+
+=method C<length()>
+
+Returns the length of the session key.
+
+=method C<contents()>
+
+Returns the actual contents of the keyblock (the session key).
