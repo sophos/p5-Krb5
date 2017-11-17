@@ -199,7 +199,7 @@ object or undef on failure.
 
 =item get_init_creds_keytab(client, keytab[, service])
 
-Attempt to get an inintial ticket for the client using a keytab.  'client'
+Attempt to get an initial ticket for the client using a keytab.  'client'
 is a principal object for which you want an initial ticket.  'keytab' is a
 keytab object created with kt_resolve.  'service', if given, is the string
 representation (not a principal object) for the ticket to acquire.  If not
