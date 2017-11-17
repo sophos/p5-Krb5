@@ -87,6 +87,8 @@ sub AUTOLOAD {
 1;
 __END__
 
+=for Pod::Coverage KRB5_TGS_NAME constant free_context
+
 =head1 SYNOPSIS
 
   use Authen::Krb5;
