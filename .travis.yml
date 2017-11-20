@@ -6,6 +6,9 @@ addons:
       - aspell
       - aspell-en
 language: perl
+compiler:
+  - gcc
+  - clang
 perl:
   - blead
   - blead-thr
