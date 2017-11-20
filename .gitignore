@@ -2,7 +2,7 @@
 .gitgot
 *.bs
 *.o
-Authen-Krb5-*
+Krb5-*
 blib/
 Krb5.c
 Makefile
