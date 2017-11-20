@@ -1,5 +1,5 @@
 package Authen::Krb5;
-
+$Authen::Krb5::VERSION = '1.901'; # TRIAL
 # ABSTRACT: XS bindings for Kerberos 5
 
 use strict;
@@ -85,7 +85,20 @@ sub AUTOLOAD {
 # Autoload methods go after =cut, and are processed by the autosplit program.
 
 1;
+
 __END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Authen::Krb5 - XS bindings for Kerberos 5
+
+=head1 VERSION
+
+version 1.901
 
 =head1 SYNOPSIS
 
@@ -100,88 +113,90 @@ previous experience with Kerberos 5 programming.  Most of the functions here
 are documented in detail in the
 L<Kerberos 5 API documentation|http://web.mit.edu/kerberos/krb5-current/doc/appdev/refs/api/index.html>
 
-=func C<error(n)>
+=head1 FUNCTIONS
+
+=head2 C<error(n)>
 
 Returns the error code from the most recent C<Authen::Krb5> call.  If provided
 with an error code C<n>, this function will return a textual description of the
 error.
 
-=func C<init_context()>
+=head2 C<init_context()>
 
 Initializes a context for the application. Returns a C<Authen::Krb5::Context>
 object, or C<undef> if there was an error.
 
-=func C<init_ets() (DEPRECATED)>
+=head2 C<init_ets() (DEPRECATED)>
 
 Initializes the Kerberos error tables.  Should be called along with
 L</init_context()> at the beginning of a script.
 
-=func C<get_default_realm()>
+=head2 C<get_default_realm()>
 
 Returns the default realm of your host.
 
-=func C<get_host_realm(host)>
+=head2 C<get_host_realm(host)>
 
 Returns the realm of the specified host.
 
-=func C<get_krbhst(realm)>
+=head2 C<get_krbhst(realm)>
 
 Returns a list of the Kerberos servers from the specified realm.
 
-=func C<build_principal_ext(p)>
+=head2 C<build_principal_ext(p)>
 
 Not like the actual C<krb5_build_principal_ext>.  This is legacy code from
 Malcolm's code, which I'll probably change in future releases.  In any case,
 it creates a 'server' principal for use in getting a TGT.  Pass it the
 principal for which you would like a TGT.
 
-=func C<parse_name(name)>
+=head2 C<parse_name(name)>
 
 Converts a string representation of a principal to a principal object.  You
 can use this to create a principal from your username.
 
-=func C<sname_to_principal(hostname,sname,type)>
+=head2 C<sname_to_principal(hostname,sname,type)>
 
 Generates a server principal from the given hostname, service, and type.
 Type can be one of the following: NT_UNKNOWN, NT_PRINCIPAL, NT_SRV_INST,
 NT_SRV_HST, NT_SRV_XHST, NT_UID.  See the Kerberos documentation for details.
 
-=func C<cc_resolve(name)>
+=head2 C<cc_resolve(name)>
 
 Returns a credentials cache identifier which corresponds to the given name.
 'name' must be in the form TYPE:RESIDUAL.  See the Kerberos documentation
 for more information.
 
-=func C<cc_default_name()>
+=head2 C<cc_default_name()>
 
 Returns the name of the default credentials cache, which may be equivalent
 to KRB5CCACHE.
 
-=func C<cc_default()>
+=head2 C<cc_default()>
 
 Returns a L<Authen::Krb5::Ccache> object representing the default credentials
 cache.
 
-=func C<kt_resolve(name)>
+=head2 C<kt_resolve(name)>
 
 Returns a L<Authen::Krb5::Keytab> object representing the specified keytab name.
 
-=func C<kt_default_name()>
+=head2 C<kt_default_name()>
 
 Returns a sting containing the default keytab name.
 
-=func C<kt_default()>
+=head2 C<kt_default()>
 
 Returns an L<Authen::Krb5::Keytab> object representing the default keytab.
 
-=func C<kt_read_service_key(name, principal[, kvno, enctype])>
+=head2 C<kt_read_service_key(name, principal[, kvno, enctype])>
 
 Searches the keytab specified by I<name> (the default keytab if
 I<name> is undef) for a key matching I<principal> (and optionally
 I<kvno> and I<enctype>) and returns the key in the form of an
 L<Authen::Krb5::Keyblock> object.
 
-=func C<get_init_creds_password(client, password[, service])>
+=head2 C<get_init_creds_password(client, password[, service])>
 
 Attempt to get an initial ticket for the client.  'client' is a principal
 object for which you want an initial ticket.  'password' is the password for
@@ -190,7 +205,7 @@ principal object) for the ticket to acquire.  If not given, it defaults to
 C<krbtgt/REALM@REALM> for the local realm.  Returns an L<Authen::Krb5::Creds>
 object or undef on failure.
 
-=func C<get_init_creds_keytab(client, keytab[, service])>
+=head2 C<get_init_creds_keytab(client, keytab[, service])>
 
 Attempt to get an inintial ticket for the client using a keytab.  'client'
 is a principal object for which you want an initial ticket.  'keytab' is a
@@ -199,7 +214,7 @@ representation (not a principal object) for the ticket to acquire.  If not
 given, it defaults to C<krbtgt/REALM@REALM> for the local realm.  Returns an
 L<Authen::Krb5::Creds> object or undef on failure.
 
-=func C<get_in_tkt_with_password(client,server,password,cc)>
+=head2 C<get_in_tkt_with_password(client,server,password,cc)>
 
 Attempt to get an initial ticket for the client.  'client' is a principal
 object for which you want an initial ticket.  'server' is a principal object
@@ -211,7 +226,7 @@ Although this interface is deprecated in the Kerberos C libraries, it's
 supported in the Perl module.  In this module, it's implemented in terms of
 C<krb5_get_init_creds_password>, L<krb5_cc_initialize>, and L<krb5_cc_store_cred>.
 
-=func C<get_in_tkt_with_keytab(client,server,keytab,cc)>
+=head2 C<get_in_tkt_with_keytab(client,server,keytab,cc)>
 
 Obtain an initial ticket for the client using a keytab.  'client' is a
 principal object for which you want an initial ticket.  'server' is a
@@ -224,7 +239,7 @@ Although this interface is deprecated in the Kerberos C libraries, it's
 supported in the Perl module.  In this module, it's implemented in terms of
 L<krb5_get_init_creds_keytab>, L<krb5_cc_initialize>, and L<krb5_cc_store_cred>.
 
-=func C<mk_req(auth_context,ap_req_options,service,hostname,in,cc)>
+=head2 C<mk_req(auth_context,ap_req_options,service,hostname,in,cc)>
 
 Obtains a ticket for a specified service and returns a C<KRB_AP_REQ> message
 suitable for passing to rd_req.  'auth_context' is the L<Authen::Krb5::AuthContext>
@@ -234,7 +249,7 @@ the name of the service for which you want a ticket (like 'host'), hostname
 is the hostname of the server, 'in' can be any user-specified data that can
 be verified at the server end, and 'cc' is your credentials cache object.
 
-=func C<rd_req(auth_context,in,server,keytab)>
+=head2 C<rd_req(auth_context,in,server,keytab)>
 
 Parses a C<KRB_AP_REQ> message and returns its contents in a L<Authen::Krb5::Ticket>
 object.  'auth_context' is the connection's L<Authen::Krb5::AuthContext> object,
@@ -243,17 +258,17 @@ expected server's name for the ticket.  'keytab' is a L<Authen::Krb5::Keytab>
 object for the keytab you want to use.  Specify C<undef> or leave off to use
 the default keytab.
 
-=func C<mk_priv(auth_context,in)>
+=head2 C<mk_priv(auth_context,in)>
 
 Encrypts 'in' using parameters specified in auth_context, and returns the
 encrypted data.  Requires use of a replay cache.
 
-=func C<rd_priv(auth_context,in)>
+=head2 C<rd_priv(auth_context,in)>
 
 Decrypts 'in' using parameters specified in auth_context, and returns the
 decrypted data.
 
-=func C<sendauth(auth_context,fh,version,client,server,options,in,in_creds,cc)>
+=head2 C<sendauth(auth_context,fh,version,client,server,options,in,in_creds,cc)>
 
 Obtains and sends an authenticated ticket from a client program to a server
 program using the filehandle 'fh'.  'version' is an application-defined
@@ -267,7 +282,7 @@ application.  'in_creds' is not yet supported, so just use 'undef' here.  'cc'
 should be set to the current credentials cache.  sendauth returns true
 on success and undefined on failure.
 
-=func C<recvauth(auth_context,fh,version,server,keytab)>
+=head2 C<recvauth(auth_context,fh,version,server,keytab)>
 
 Receives authentication data from a client using the sendauth function through
 the filehandle 'fh'.  'version' is as described in the sendauth section.
@@ -276,7 +291,7 @@ the filehandle 'fh'.  'version' is as described in the sendauth section.
 service.  recvauth returns a C<Authen::Krb5::Ticket> object on success or
 undefined on failure.
 
-=func C<genaddrs(auth_context,fh,flags)>
+=head2 C<genaddrs(auth_context,fh,flags)>
 
 Uses the open socket filehandle 'fh' to generate local and remote addresses
 for auth_context.  Flags should be one of the following, depending on the
@@ -287,20 +302,20 @@ type of address you want to generate (flags can be OR'ed):
   KRB5_AUTH_CONTEXT_GENERATE_REMOTE_ADDR
   KRB5_AUTH_CONTEXT_GENERATE_REMOTE_FULL_ADDR
 
-=func C<gen_portaddr(addr,port)>
+=head2 C<gen_portaddr(addr,port)>
 
 Generates a local port address that can be used to name a replay cache.  'addr' is a L<Authen::Krb5::Address> object, and port is a port number in network byte
 order.  For generateing a replay cache name, you should supply the local
 address of the client and the socket's local port number.  Returns a
 Authen::Krb5::Address object containing the address.
 
-=func C<gen_replay_name(addr,string)>
+=head2 C<gen_replay_name(addr,string)>
 
 Generate a unique replay cache name.  'addr' is a L<Authen::Krb5::Address> object
 created by gen_portaddr.  'string' is used as a unique identifier for the
 replay cache.  Returns the replay cache name.
 
-=func C<get_server_rcache(name)>
+=head2 C<get_server_rcache(name)>
 
 Returns a L<Authen::Krb5::Rcache> object using the replay cache name 'name.'
 
@@ -312,3 +327,16 @@ contributions from Scott Hutton (shutton@indiana.edu).
 =head1 SEE ALSO
 
 perl(1), kerberos(1).
+
+=head1 AUTHOR
+
+Jeff Horwitz <jeff@smashing.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2000 by Jeff Horwitz.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
