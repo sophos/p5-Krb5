@@ -1,5 +1,14 @@
 Revision history for Perl extension Krb5.
 
+1.901 2017-11-20T21:11:01Z
+ - Try `krb5-config` if pkgconf is unavailable (Ioan Rogers)
+ - Only build against MIT kerberos, not compatable with Heimdal (Ioan
+   Rogers)
+ - [Closes rt#58960] fix POD spelling mistake (Ken Dreyer)
+ - Re-arranged and removed things to use `Dist::Zilla` (Ioan Rogers)
+ - [Closes rt#116071] remove references to obsolete krb5_{get,free}_krbhst
+   (Damyan Ivanov)
+
 1.9 Add Authen::Krb5::Creds object (tom.jones@oucs.ox.ac.uk)
 
 1.8 Fix broken get_in_tkt_with_password implementation (rra@debian.org)
