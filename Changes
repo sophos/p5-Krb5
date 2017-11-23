@@ -1,5 +1,15 @@
 Revision history for Perl extension Krb5.
 
+1.902 2017-11-23T17:35:02Z (TRIAL RELEASE)
+ - exit instead of die if prereqs aren't met to generate n/a reports in
+   cpantesters (I hope) (Ioan Rogers)
+ - Map some committers to their CPAN ids (Ioan Rogers)
+ - File::which is needed to find krb5-config (Ioan Rogers)
+ - Main module is Authen::Krb5, but dist is Krb5 (Ioan Rogers)
+ - Add TODO for future XS/C coverage (Ioan Rogers)
+ - Ignore missing POD for a few subs (Ioan Rogers)
+ - Add a fresh travis config courtesy of `App::CISetup` (Ioan Rogers)
+
 1.901 2017-11-20T21:11:01Z
  - Try `krb5-config` if pkgconf is unavailable (Ioan Rogers)
  - Only build against MIT kerberos, not compatable with Heimdal (Ioan
