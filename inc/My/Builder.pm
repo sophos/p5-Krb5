@@ -27,7 +27,8 @@ sub new {
         my $krb5_config = File::Which::which('krb5-config');
 
         if (!$krb5_config) {
-            die "Failed to get pkgconfig info or find krb5-config script!\n";
+            print "Failed to get pkgconfig info or find krb5-config script!\n";
+	        exit;
         }
 
         $cflags = `$krb5_config --cflags`;
@@ -48,7 +49,8 @@ sub new {
     printf "Found %s kerberos 5 version %s\n", $vendor, $version;
 
     if ($vendor ne 'MIT') {
-        die 'This module currently only supports MIT kerberos';
+	print "This module currently only supports MIT kerberos\n";
+	exit;
     }
 
     if ($cflags) {
