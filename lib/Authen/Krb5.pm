@@ -4,7 +4,7 @@ package Authen::Krb5;
 
 use strict;
 use Carp;
-use vars qw($VERSION @ISA @EXPORT @EXPORT_OK $AUTOLOAD);
+use vars qw(@ISA @EXPORT @EXPORT_OK $AUTOLOAD);
 
 require 5.004;
 
