@@ -93,6 +93,8 @@ void freed(SV *sv)
 
 MODULE = Authen::Krb5		PACKAGE = Authen::Krb5		PREFIX = krb5_
 
+PROTOTYPES: DISABLE
+
 double
 constant(name, arg)
 	char *name
