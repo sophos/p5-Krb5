@@ -1,5 +1,8 @@
 Revision history for Perl extension Krb5.
 
+1.903 2017-11-28T20:56:14Z
+ - No changes from 1.902-TRIAL
+
 1.902 2017-11-23T17:35:02Z (TRIAL RELEASE)
  - exit instead of die if prereqs aren't met to generate n/a reports in
    cpantesters (I hope) (Ioan Rogers)
