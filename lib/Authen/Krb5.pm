@@ -3,10 +3,11 @@ package Authen::Krb5;
 # ABSTRACT: XS bindings for Kerberos 5
 
 use strict;
+use warnings;
 use Carp;
 use vars qw(@ISA @EXPORT @EXPORT_OK $AUTOLOAD);
 
-require 5.004;
+use 5.008_008;
 
 require Exporter;
 require DynaLoader;
