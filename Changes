@@ -1,10 +1,12 @@
 Revision history for Perl extension Authen-Krb5.
 
-1.904 2017-11-29T15:10:21Z
+1.904 2017-11-29T15:12:05Z
+ - PAUSE error on last release. I only have permissions for Authen::Krb5,
+   not Krb5, so try that (Ioan Rogers)
  - Add 'provides' to metadata (Ioan Rogers)
  - Add META.yml for older toolchains (Ioan Rogers)
  - Explicitly disable prototypes to shut up xsubpp (Ioan Rogers)
- - $VERSION is added by dzilla (Ioan Rogers)
+ - $VERSION is added by dzilla, don't declare it ourselves (Ioan Rogers)
 
 1.903 2017-11-28T20:56:14Z
  - No changes from 1.902-TRIAL
