@@ -1,5 +1,14 @@
 Revision history for Perl extension Authen-Krb5.
 
+1.905 2017-12-04T20:30:08Z
+ - Make sure tests and author/release tests are run before making a release
+   (Ioan Rogers)
+ - Try to make sure we don't accidentally use features from a newer perl
+   (Ioan Rogers)
+ - use warnings; requires 5.6 but skip to 5.8 because 5.6 builds fail on
+   travis and it's too old to care about (Ioan Rogers)
+ - Have travis test all supported versions (Ioan Rogers)
+
 1.904 2017-11-29T15:12:05Z
  - PAUSE error on last release. I only have permissions for Authen::Krb5,
    not Krb5, so try that (Ioan Rogers)
