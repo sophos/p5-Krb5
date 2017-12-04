@@ -1,5 +1,5 @@
 # PODNAME: Authen::Krb5::Principal
-# ABSTRACT: Kerberos 5 princpal object.
+# ABSTRACT: Kerberos 5 principal object.
 
 =method C<realm()>
 

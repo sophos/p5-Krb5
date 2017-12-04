@@ -36,5 +36,5 @@ object.
 
 =method C<end_seq_get(cursor)>
 
-Perform cleanup opreations after I<next_cred()> and invalidates
+Perform cleanup operations after I<next_cred()> and invalidates
 I<cursor>.

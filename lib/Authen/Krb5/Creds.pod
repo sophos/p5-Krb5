@@ -3,19 +3,19 @@
 
 =method C<starttime()>
 
-Returns the starttime time property of the credential.
+Returns the C<starttime> time property of the credential.
 
 =method C<authtime()>
 
-Returns the authtime time property of the credential.
+Returns the C<authtime> time property of the credential.
 
 =method C<endtime()>
 
-Returns the endtime time property of the credential.
+Returns the C<endtime> time property of the credential.
 
 =method C<renew_till()>
 
-Returns the renew_till time property of the credential.
+Returns the C<renew_till> time property of the credential.
 
 =method C<server()>
 
@@ -23,13 +23,12 @@ Returns the name of the service principal the credential is for.
 
 =method C<client()>
 
-Returns the client principal name (will usually be identical for all
-credentials in a credential cache).
+Returns the client principal name (will usually be identical for all credentials in a credential cache).
 
 =method C<ticket()>
 
-Returns the Authen::Krb5::Ticket for this credential.
+Returns the L<Authen::Krb5::Ticket> for this credential.
 
 =method C<keyblock()>
 
-Returns the keyblock of the credential.
+Returns the C<keyblock> of the credential.

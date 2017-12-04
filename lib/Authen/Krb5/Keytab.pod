@@ -15,21 +15,16 @@ Returns the name of the keytab.
 
 =method C<get_entry(principal[, kvno, enctype])>
 
-Returns an Authen::Krb5::KeytabEntry object representing an entry in
-the keytab matching I<principal> and optionally I<kvno> and
-I<enctype>.
+Returns an L<Authen::Krb5::KeytabEntry> object representing an entry in the keytab matching C<principal> and optionally C<kvno> and C<enctype>.
 
 =method C<start_seq_get()>
 
-Returns a cursor that can be passed to <I<next_entry()> to read in turn
-every key in the keytab.
+Returns a cursor that can be passed to L</next_entry> to read in turn every key in the keytab.
 
 =method C<next_entry(cursor)>
 
-Returns the next entry in the keytab as an Authen::Krb5::KeytabEntry
-object.
+Returns the next entry in the keytab as an L<Authen::Krb5::KeytabEntry> object.
 
 =method C<end_seq_get(cursor)>
 
-Perform cleanup opreations after I<next_entry()> and invalidates
-I<cursor>.
+Perform cleanup operations after L</next_entry> and invalidates C<cursor>.

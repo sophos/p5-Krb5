@@ -158,7 +158,7 @@ for more information.
 =func C<cc_default_name()>
 
 Returns the name of the default credentials cache, which may be equivalent
-to KRB5CCACHE.
+to C<$ENV{KRB5CCACHE}>.
 
 =func C<cc_default()>
 
@@ -179,10 +179,7 @@ Returns an L<Authen::Krb5::Keytab> object representing the default keytab.
 
 =func C<kt_read_service_key(name, principal[, kvno, enctype])>
 
-Searches the keytab specified by I<name> (the default keytab if
-I<name> is undef) for a key matching I<principal> (and optionally
-I<kvno> and I<enctype>) and returns the key in the form of an
-L<Authen::Krb5::Keyblock> object.
+Searches the keytab specified by C<name> (the default keytab if C<name> is undef) for a key matching C<principal> (and optionally C<kvno> and C<enctype>) and returns the key in the form of an L<Authen::Krb5::Keyblock> object.
 
 =func C<get_init_creds_password(client, password[, service])>
 
@@ -195,7 +192,7 @@ object or undef on failure.
 
 =func C<get_init_creds_keytab(client, keytab[, service])>
 
-Attempt to get an inintial ticket for the client using a keytab.  'client'
+Attempt to get an initial ticket for the client using a keytab.  'client'
 is a principal object for which you want an initial ticket.  'keytab' is a
 keytab object created with kt_resolve.  'service', if given, is the string
 representation (not a principal object) for the ticket to acquire.  If not
@@ -219,7 +216,7 @@ C<krb5_get_init_creds_password>, L<krb5_cc_initialize>, and L<krb5_cc_store_cred
 Obtain an initial ticket for the client using a keytab.  'client' is a
 principal object for which you want an initial ticket.  'server' is a
 principal object for the service (usually C<krbtgt/REALM@REALM>).  'keytab' is
-a keytab object createed with kt_resolve.  'cc' is a L<Authen::Krb5::Ccache>
+a keytab object created with kt_resolve.  'cc' is a L<Authen::Krb5::Ccache>
 object representing the current credentials cache.  Returns a Kerberos error
 code.
 
@@ -231,7 +228,7 @@ L<krb5_get_init_creds_keytab>, L<krb5_cc_initialize>, and L<krb5_cc_store_cred>.
 
 Obtains a ticket for a specified service and returns a C<KRB_AP_REQ> message
 suitable for passing to rd_req.  'auth_context' is the L<Authen::Krb5::AuthContext>
-object you want to use for this connection, 'ap_req_options' is an OR'ed
+object you want to use for this connection, 'ap_req_options' is an ORed
 representation of the possible options (see Kerberos docs), 'service' is
 the name of the service for which you want a ticket (like 'host'), hostname
 is the hostname of the server, 'in' can be any user-specified data that can
@@ -239,12 +236,12 @@ be verified at the server end, and 'cc' is your credentials cache object.
 
 =func C<rd_req(auth_context,in,server,keytab)>
 
-Parses a C<KRB_AP_REQ> message and returns its contents in a L<Authen::Krb5::Ticket>
-object.  'auth_context' is the connection's L<Authen::Krb5::AuthContext> object,
-'in' is the C<KRB_AP_REQ> message (usually from mk_req), and server is the
-expected server's name for the ticket.  'keytab' is a L<Authen::Krb5::Keytab>
-object for the keytab you want to use.  Specify C<undef> or leave off to use
-the default keytab.
+Parses a C<KRB_AP_REQ> message and returns its contents in a L<Authen::Krb5::Ticket> object.
+C<auth_context> is the connection's L<Authen::Krb5::AuthContext> object.
+C<in> is the C<KRB_AP_REQ> message (usually from mk_req).
+C<server> is the expected server's name for the ticket.
+C<keytab> is a L<Authen::Krb5::Keytab> object for the keytab you want to use.
+Specify C<undef> or leave off to use the default keytab.
 
 =func C<mk_priv(auth_context,in)>
 
@@ -258,32 +255,28 @@ decrypted data.
 
 =func C<sendauth(auth_context,fh,version,client,server,options,in,in_creds,cc)>
 
-Obtains and sends an authenticated ticket from a client program to a server
-program using the filehandle 'fh'.  'version' is an application-defined
-version string that recvauth compares to its own version string.  'client'
-is the client principal, e.g. C<username@REALM>.  'server' is the service
-principal to which you are authenticating, e.g. C<service.hostname@REALM>.
-The only useful option right now is C<AP_OPTS_MUTUAL_REQUIRED>, which forces
-sendauth to perform mutual authentication with the server.  'in' is a string
-that will be received by recvauth and verified by the server--it's up to the
-application.  'in_creds' is not yet supported, so just use 'undef' here.  'cc'
-should be set to the current credentials cache.  sendauth returns true
-on success and undefined on failure.
+Obtains and sends an authenticated ticket from a client program to a server program using the filehandle C<fh>.
+C<version> is an application-defined version string that L</recvauth> compares to its own version string.
+C<client> is the client principal, e.g. C<username@REALM>.
+C<server> is the service principal to which you are authenticating, e.g. C<service.hostname@REALM>.
+The only useful option right now is C<AP_OPTS_MUTUAL_REQUIRED>, which forces L</sendauth> to perform mutual authentication with the server.
+C<in> is a string that will be received by L</recvauth> and verified by the server--it's up to the application.
+C<in_creds> is not yet supported, so just use C<undef> here.
+C<cc> should be set to the current credentials cache.
+Returns true on success and undefined on failure.
 
 =func C<recvauth(auth_context,fh,version,server,keytab)>
 
-Receives authentication data from a client using the sendauth function through
-the filehandle 'fh'.  'version' is as described in the sendauth section.
-'server' is the server principal to which the client will be authenticating.
-'keytab' is a C<Authen::Krb5::Keytab> object specifying the keytab to use for this
-service.  recvauth returns a C<Authen::Krb5::Ticket> object on success or
-undefined on failure.
+Receives authentication data from a client using the L</sendauth> function through the filehandle C<fh>.
+C<version> is as described in the L</sendauth> section.
+C<server> is the server principal to which the client will be authenticating.
+C<keytab> is a C<Authen::Krb5::Keytab> object specifying the keytab to use for this service.
+Returns a C<Authen::Krb5::Ticket> object on success or undefined on failure.
 
 =func C<genaddrs(auth_context,fh,flags)>
 
-Uses the open socket filehandle 'fh' to generate local and remote addresses
-for auth_context.  Flags should be one of the following, depending on the
-type of address you want to generate (flags can be OR'ed):
+Uses the open socket filehandle C<fh> to generate local and remote addresses for C<auth_context>.
+Flags should be one of the following, depending on the type of address you want to generate (flags can be ORed):
 
   KRB5_AUTH_CONTEXT_GENERATE_LOCAL_ADDR
   KRB5_AUTH_CONTEXT_GENERATE_LOCAL_FULL_ADDR
@@ -292,16 +285,17 @@ type of address you want to generate (flags can be OR'ed):
 
 =func C<gen_portaddr(addr,port)>
 
-Generates a local port address that can be used to name a replay cache.  'addr' is a L<Authen::Krb5::Address> object, and port is a port number in network byte
-order.  For generateing a replay cache name, you should supply the local
-address of the client and the socket's local port number.  Returns a
-Authen::Krb5::Address object containing the address.
+Generates a local port address that can be used to name a replay cache.
+C<addr> is a L<Authen::Krb5::Address> object, and C<port> is a port number in network byte order.
+For generating a replay cache name, you should supply the local address of the client and the socket's local port number.
+Returns a L<Authen::Krb5::Address> object containing the address.
 
 =func C<gen_replay_name(addr,string)>
 
-Generate a unique replay cache name.  'addr' is a L<Authen::Krb5::Address> object
-created by gen_portaddr.  'string' is used as a unique identifier for the
-replay cache.  Returns the replay cache name.
+Generate a unique replay cache name.
+C<addr> is a L<Authen::Krb5::Address> object created by L</gen_portaddr>.
+C<string> is used as a unique identifier for the replay cache.
+Returns the replay cache name.
 
 =func C<get_server_rcache(name)>
 
