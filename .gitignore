@@ -1,10 +1,10 @@
-.build
-.gitgot
 *.bs
 *.o
+.build
+.gitgot
 Krb5-*
-blib/
 Krb5.c
-Makefile
 MYMETA.*
+Makefile
+blib/
 pm_to_blib

@@ -28,7 +28,7 @@ sub new {
 
         if (!$krb5_config) {
             print "Failed to get pkgconfig info or find krb5-config script!\n";
-	        exit;
+            exit;
         }
 
         $cflags = `$krb5_config --cflags`;
@@ -49,8 +49,8 @@ sub new {
     printf "Found %s kerberos 5 version %s\n", $vendor, $version;
 
     if ($vendor ne 'MIT') {
-	print "This module currently only supports MIT kerberos\n";
-	exit;
+        print "This module currently only supports MIT kerberos\n";
+        exit;
     }
 
     if ($cflags) {

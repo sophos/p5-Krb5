@@ -1,0 +1,14 @@
+[PerlTidy]
+select = **/*.{pm,t}
+select = eg/*
+argv = --profile=$ROOT/.perltidyrc
+except_modes = test
+
+[SortLines]
+select = .gitignore
+except_modes = test
+
+[UniqueLines]
+select = .gitignore
+except_modes = test
+
