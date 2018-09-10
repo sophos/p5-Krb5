@@ -1040,26 +1040,26 @@ DESTROY(addr)
 
 MODULE = Authen::Krb5	PACKAGE = Authen::Krb5::Keyblock
 
- 
+
 krb5_enctype
 enctype(keyblock)
 	Authen::Krb5::Keyblock keyblock
 
-        CODE:
-        RETVAL = keyblock->enctype;
+	CODE:
+	RETVAL = keyblock->enctype;
 
-        OUTPUT:
-        RETVAL
+	OUTPUT:
+	RETVAL
  
 unsigned int
 length(keyblock)
-        Authen::Krb5::Keyblock keyblock
+	Authen::Krb5::Keyblock keyblock
 
-        CODE:
-        RETVAL = keyblock->length;
+	CODE:
+	RETVAL = keyblock->length;
 
-        OUTPUT:
-        RETVAL
+	OUTPUT:
+	RETVAL
 
 SV *
 contents(keyblock)
@@ -1138,7 +1138,7 @@ get_name(keytab)
         err = krb5_kt_get_name(context, keytab, name, MAX_KEYTAB_NAME_LEN);
 	if (err)
                 XSRETURN_UNDEF;
-	RETVAL = sv_2mortal(newSVpv(name, 0));
+	RETVAL = newSVpv(name, 0);
         can_free((SV *)RETVAL);
 
         OUTPUT:
