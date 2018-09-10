@@ -1040,6 +1040,45 @@ DESTROY(addr)
 
 MODULE = Authen::Krb5	PACKAGE = Authen::Krb5::Keyblock
 
+Authen::Krb5::Keyblock
+new(class, principal, enctype, pw, salt=0)
+	char *class
+	Authen::Krb5::Principal principal
+	krb5_enctype enctype
+	SV *pw
+	SV *salt
+
+	PREINIT:
+	krb5_data saltdata;
+	krb5_data pwdata;
+	int mustfree_saltdata = 0;
+
+	CODE:
+	if (!New(0, RETVAL, 1, krb5_keyblock))
+		XSRETURN_UNDEF;
+
+	pwdata.data = SvPV(pw,pwdata.length);
+	saltdata.data = SvPV(salt,saltdata.length);
+
+	if (!salt) {
+		/* get default salt */
+		err = krb5_principal2salt(context, principal, &saltdata);
+		if (err)
+			XSRETURN_UNDEF;
+		mustfree_saltdata = 1;
+	}
+
+	err = krb5_c_string_to_key(context, enctype, &pwdata,
+				&saltdata, RETVAL);
+	if (mustfree_saltdata)
+		krb5_free_data(context,&saltdata);
+	if (err)
+		XSRETURN_UNDEF;
+
+	can_free((SV *)RETVAL);
+
+	OUTPUT:
+	RETVAL
 
 krb5_enctype
 enctype(keyblock)
