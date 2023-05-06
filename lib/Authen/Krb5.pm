@@ -114,6 +114,11 @@ error.
 Initializes a context for the application. Returns a C<Authen::Krb5::Context>
 object, or C<undef> if there was an error.
 
+=func C<cc_copy_creds(incc, outcc)>
+
+Copies a credential cache to a different one. C<outcc>, the credential cache
+to be filled in, can be of different type.
+
 =func C<init_ets() (DEPRECATED)>
 
 Initializes the Kerberos error tables.  Should be called along with

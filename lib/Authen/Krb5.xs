@@ -617,6 +617,17 @@ krb5_recvauth(auth_context,fh,version,server,keytab)
 	sv_setref_pv(ST(0),"Authen::Krb5::Ticket",(void*)ticket);
 	XSRETURN(1);
 
+void
+cc_copy_creds(incc,outcc)
+        Authen::Krb5::Ccache incc
+        Authen::Krb5::Ccache outcc
+
+        CODE:
+        err = krb5_cc_copy_creds(context, incc, outcc);
+        if (err) XSRETURN_UNDEF;
+        XSRETURN_YES;
+
+
 
 MODULE = Authen::Krb5	PACKAGE = Authen::Krb5::Principal
 
